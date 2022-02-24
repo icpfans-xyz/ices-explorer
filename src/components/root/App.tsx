@@ -1,13 +1,16 @@
-import {HelmetProvider} from "react-helmet-async";
-import {AuthProvider} from "~/components/contexts/UserContext";
-import Main from "~/components/root/Main";
+import { HelmetProvider } from 'react-helmet-async'
+import Main from '~/components/root/Main'
+import { ConfigProvider } from 'antd'
+// import zhCN from 'antd/es/locale/zh_CN'
+import enUS from 'antd/lib/locale/en_US'
+import 'antd/dist/antd.css'
 
 export const App = () => {
-  return (
-    <HelmetProvider>
-      <AuthProvider>
-        <Main />
-      </AuthProvider>
-    </HelmetProvider>
-  )
-};
+    return (
+        <ConfigProvider locale={enUS}>
+            <HelmetProvider>
+                <Main />
+            </HelmetProvider>
+        </ConfigProvider>
+    )
+}
