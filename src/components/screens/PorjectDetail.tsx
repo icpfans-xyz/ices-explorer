@@ -25,11 +25,11 @@ const PorjectDetail: FC = () => {
     const { projectId } = useParams()
     const [logs, setLogs] = useState([])
     const [day, setDay] = useState(7)
-    const [lineData, setLineData] = useState<LogObject | null>([])
+    const [lineData, setLineData]: [any, any] = useState([])
     const [currentPage, setPage] = useState<number>(1)
     const [offset, setOffset] = useState<number>(10)
     const [total, setTotal] = useState<number>(0)
-    function changeSize(current, size) {
+    function changeSize(current: number, size: number) {
         setOffset(size)
     }
     async function getData() {
@@ -137,7 +137,7 @@ const PorjectDetail: FC = () => {
                             <th>project_id</th>
                             <th>event_type</th>
                             <th>event_value</th>
-                            <th>caller</th>
+                            <th>canister_id</th>
                             <th>create_time</th>
                         </tr>
                     </thead>

@@ -25,11 +25,11 @@ const PorjectDetail: FC = () => {
     const { callerId } = useParams()
     const [logs, setLogs] = useState([])
     const [day, setDay] = useState(7)
-    const [lineData, setLineData] = useState<LogObject | null>([])
+    const [lineData, setLineData] = useState([])
     const [currentPage, setPage] = useState<number>(1)
     const [offset, setOffset] = useState<number>(10)
     const [total, setTotal] = useState<number>(0)
-    function changeSize(current, size) {
+    function changeSize(current: number, size: number) {
         setOffset(size)
     }
     async function getData() {
@@ -53,15 +53,14 @@ const PorjectDetail: FC = () => {
     async function getAllcountsByDay() {
         const query = gql`
         query MyQuery {
-            test_project_id_${day}d_count${day === 90 ? 's': ''}(where: {caller: {_eq: "${callerId}"}}) {
+            data_day_project_${day}d_counts(where: {canister_id: {_eq: "${callerId}"}}) {
                 counts
                 time
-                project_id
             }
         }`
 
         const res = await graphQLClient.request(query)
-        setLineData(res[`test_project_id_${day}d_count${day === 90 ? 's': ''}`])
+        setLineData(res[`data_day_project_${day}d_counts`])
     }
     // function pageChange(p) {
     //     console.log(p)
@@ -98,7 +97,7 @@ const PorjectDetail: FC = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>Back
             </Link>
-            <h1 className="text-5xl font-bold mt-8">Caller: {callerId}</h1>
+            <h1 className="text-5xl font-bold mt-8">CanisterId: {callerId}</h1>
             <div className="card w-full shadow-xl mt-20">
                 <div className="card-body w-full" style={{ height: 500 }}>
                     <h2 className="card-title">Total caller events / {day} day</h2>
@@ -134,8 +133,7 @@ const PorjectDetail: FC = () => {
                     <thead>
                         <tr>
                             <th />
-                            <th>caller</th>
-                            
+                            <th>canister_id</th>
                             <th>event_type</th>
                             <th>event_value</th>
                             <th>project_id</th>

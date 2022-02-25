@@ -12,7 +12,7 @@ const CallerDetailScreen = lazy(() => import('~/components/screens/CallerDetail'
 const Layout: FC = () => {
     return (
         <div className="bg-gray-100 min-h-screen box-border pb-20">
-            <div className="navbar bg-white text-primary-content">
+            <div className="navbar bg-white text-primary-content h-20">
                 <div className="container mx-auto">
                     <a href="/" className=" normal-case text-xl w-32 h-12">
                         <img src={logo} alt="" />
