@@ -1,16 +1,25 @@
 import { Head } from '~/components/shared/Head'
 import { FC, useEffect, useState } from 'react'
 import { GraphQLClient, gql } from 'graphql-request'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import {
+    LineChart,
+    Line,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    Legend,
+    ResponsiveContainer
+} from 'recharts'
 import { Pagination } from 'antd'
 import { Link } from 'react-router-dom'
-const endpoint = 'http://graph.ices.one/v1/graphql'
+import { endpoint } from 'config'
 
 const graphQLClient = new GraphQLClient(endpoint, {
     headers: {
         'content-type': 'application/json',
-        'x-hasura-admin-secret': 'df8UEfMjqN6apt',
-    },
+        'x-hasura-admin-secret': 'df8UEfMjqN6apt'
+    }
 })
 type LogObject = {
     id: number
@@ -60,7 +69,9 @@ const Index: FC = () => {
     async function getData() {
         const query = gql`
         query MyQuery {
-            event_log_test(order_by: {time: desc}, limit: ${offset}, offset: ${offset * currentPage}) {
+            event_log_test(order_by: {time: desc}, limit: ${offset}, offset: ${
+            offset * currentPage
+        }) {
                 id
                 caller
                 event_value
@@ -92,13 +103,14 @@ const Index: FC = () => {
     // }
     async function getLogTotal() {
         const query = gql`
-        query MyQuery {
-            event_log_test_aggregate {
-                aggregate {
-                    count
+            query MyQuery {
+                event_log_test_aggregate {
+                    aggregate {
+                        count
+                    }
                 }
             }
-        }`
+        `
         const res = await graphQLClient.request(query)
         setTotal(res.event_log_test_aggregate.aggregate.count)
     }
@@ -118,15 +130,29 @@ const Index: FC = () => {
             <Head title="ICES | Event LOG" />
             <div className="form-control">
                 <div className="input-group">
-                    <input type="text" placeholder="input ProjectID or CanisterID" className="input input-bordered w-full" />
+                    <input
+                        type="text"
+                        placeholder="input ProjectID or CanisterID"
+                        className="w-full input input-bordered"
+                    />
                     <button className="btn btn-square">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="w-6 h-6"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                            />
                         </svg>
                     </button>
                 </div>
             </div>
-            <div className="shadow stats w-full mt-20">
+            <div className="w-full mt-20 shadow stats">
                 <div className="stat">
                     {/* <div className="stat-figure text-primary">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-8 h-8 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
@@ -165,8 +191,8 @@ const Index: FC = () => {
                     <div className="stat-desc text-secondary">31 tasks remaining</div>
                 </div> */}
             </div>
-            <div className="card bg-white w-full shadow-md mt-20">
-                <div className="card-body w-full" style={{ height: 500 }}>
+            <div className="w-full mt-20 bg-white shadow-md card">
+                <div className="w-full card-body" style={{ height: 500 }}>
                     <h2 className="card-title">Total IC events / {day} day</h2>
                     <ResponsiveContainer width="100%" height="100%">
                         <LineChart
@@ -177,26 +203,36 @@ const Index: FC = () => {
                                 top: 5,
                                 right: 50,
                                 left: 0,
-                                bottom: 0,
-                            }}
-                        >
+                                bottom: 0
+                            }}>
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis dataKey="time" interval="preserveStart" />
                             <YAxis />
                             <Tooltip />
                             <Legend />
-                            <Line type="monotone" dataKey="counts" stroke="#8884d8" activeDot={{ r: 8 }} />
+                            <Line
+                                type="monotone"
+                                dataKey="counts"
+                                stroke="#8884d8"
+                                activeDot={{ r: 8 }}
+                            />
                         </LineChart>
                     </ResponsiveContainer>
                     <div className="flex justify-end space-x-3">
-                        <button className="btn btn-primary" onClick={() => setDay(7)}>7d</button>
-                        <button className="btn btn-primary" onClick={() => setDay(30)}>30d</button>
-                        <button className="btn btn-primary" onClick={() => setDay(90)}>90d</button>
+                        <button className="btn btn-primary" onClick={() => setDay(7)}>
+                            7d
+                        </button>
+                        <button className="btn btn-primary" onClick={() => setDay(30)}>
+                            30d
+                        </button>
+                        <button className="btn btn-primary" onClick={() => setDay(90)}>
+                            90d
+                        </button>
                     </div>
                 </div>
             </div>
-            <div className="overflow-x-auto mt-20">
-                <table className="table table-zebra w-full">
+            <div className="mt-20 overflow-x-auto">
+                <table className="table w-full table-zebra">
                     <thead>
                         <tr>
                             <th />
@@ -208,28 +244,22 @@ const Index: FC = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {
-                            logs.map((v: LogObject, i) => {
-                                return (
-                                    <tr key={v.id}>
-                                        <th>{i + 1}</th>
-                                        <td><Link
-                                            to={`/project/${v.project_id}`}
-                                        >
-                                            {v.project_id}
-                                        </Link></td>
-                                        <td>{v.event_key}</td>
-                                        <td>{v.event_value}</td>
-                                        <td><Link
-                                            to={`/caller/${v.caller}`}
-                                        >
-                                            {v.caller}
-                                        </Link></td>
-                                        <td>{v.create_at}</td>
-                                    </tr>
-                                )
-                            })
-                        }
+                        {logs.map((v: LogObject, i) => {
+                            return (
+                                <tr key={v.id}>
+                                    <th>{i + 1}</th>
+                                    <td>
+                                        <Link to={`/project/${v.project_id}`}>{v.project_id}</Link>
+                                    </td>
+                                    <td>{v.event_key}</td>
+                                    <td>{v.event_value}</td>
+                                    <td>
+                                        <Link to={`/caller/${v.caller}`}>{v.caller}</Link>
+                                    </td>
+                                    <td>{v.create_at}</td>
+                                </tr>
+                            )
+                        })}
                     </tbody>
                 </table>
                 <div className="flex justify-end pt-10">
@@ -242,7 +272,7 @@ const Index: FC = () => {
                         pageSizeOptions={[10, 20, 50, 100]}
                         showSizeChanger
                         showQuickJumper
-                        showTotal={total => `Total ${total} items`}
+                        showTotal={(total) => `Total ${total} items`}
                     />
                 </div>
             </div>
