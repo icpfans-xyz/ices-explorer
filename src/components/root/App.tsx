@@ -3,7 +3,7 @@ import Main from '~/components/root/Main'
 import { ConfigProvider } from 'antd'
 // import zhCN from 'antd/es/locale/zh_CN'
 import enUS from 'antd/lib/locale/en_US'
-import 'antd/dist/antd.css'
+// import 'antd/dist/antd.css'
 
 export const App = () => {
     return (

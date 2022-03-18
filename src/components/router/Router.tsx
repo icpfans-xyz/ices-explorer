@@ -7,6 +7,7 @@ const Loading = () => <p className="p-4 w-full h-full text-center"><button class
 const IndexScreen = lazy(() => import('~/components/screens/Index'))
 const Page404Screen = lazy(() => import('~/components/screens/404'))
 const PorjectDetialScreen = lazy(() => import('~/components/screens/PorjectDetail'))
+const CanisterDetialScreen = lazy(() => import('~/components/screens/CanisterDetail'))
 const CallerDetailScreen = lazy(() => import('~/components/screens/CallerDetail'))
 
 const Layout: FC = () => {
@@ -47,6 +48,10 @@ const InnerRouter: FC = () => {
                 {
                     path:'/project/:projectId',
                     element: <PorjectDetialScreen />
+                },
+                {
+                    path:'/canister/:canisterId',
+                    element: <CanisterDetialScreen />
                 },
                 {
                     path:'/caller/:callerId',
