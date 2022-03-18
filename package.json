@@ -45,5 +45,8 @@
     "vite": "^2.8.4",
     "vite-plugin-importer": "^0.2.5",
     "vite-tsconfig-paths": "^3.4.0"
+  },
+  "engines": {
+    "node": ">=14"
   }
 }

@@ -1,14 +1,24 @@
 import { FC, useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { GraphQLClient, gql } from 'graphql-request'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import {
+    LineChart,
+    Line,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    Legend,
+    ResponsiveContainer
+} from 'recharts'
 import { Pagination } from 'antd'
-const endpoint = 'http://graph.ices.one/v1/graphql'
+import { endpoint } from 'config'
+
 const graphQLClient = new GraphQLClient(endpoint, {
     headers: {
         'content-type': 'application/json',
-        'x-hasura-admin-secret': 'df8UEfMjqN6apt',
-    },
+        'x-hasura-admin-secret': 'df8UEfMjqN6apt'
+    }
 })
 type LogObject = {
     id: number
@@ -35,7 +45,9 @@ const PorjectDetail: FC = () => {
     async function getData() {
         const query = gql`
         query MyQuery {
-            event_log_test(order_by: {time: desc}, limit: ${offset}, offset: ${offset * currentPage}, where: {project_id: {_eq: "${projectId}"}}) {
+            event_log_test(order_by: {time: desc}, limit: ${offset}, offset: ${
+            offset * currentPage
+        }, where: {project_id: {_eq: "${projectId}"}}) {
                 id
                 caller
                 event_value
@@ -53,7 +65,9 @@ const PorjectDetail: FC = () => {
     async function getAllcountsByDay() {
         const query = gql`
         query MyQuery {
-            test_project_id_${day}d_count${day === 90 ? 's': ''}(where: {project_id: {_eq: "${projectId}"}}) {
+            test_project_id_${day}d_count${
+            day === 90 ? 's' : ''
+        }(where: {project_id: {_eq: "${projectId}"}}) {
                 counts
                 time
                 project_id
@@ -61,7 +75,7 @@ const PorjectDetail: FC = () => {
         }`
 
         const res = await graphQLClient.request(query)
-        setLineData(res[`test_project_id_${day}d_count${day === 90 ? 's': ''}`])
+        setLineData(res[`test_project_id_${day}d_count${day === 90 ? 's' : ''}`])
     }
     // function pageChange(p) {
     //     console.log(p)
@@ -90,18 +104,28 @@ const PorjectDetail: FC = () => {
     }, [day])
     return (
         <div>
-            <Link
-                className="flex items-center text-lg"
-                to="/"
-            >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>Back
+            <Link className="flex items-center text-lg" to="/">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-6 h-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 19l-7-7 7-7"
+                    />
+                </svg>
+                Back
             </Link>
-            <h1 className="text-5xl font-bold mt-8">ProjectId: {projectId}</h1>
-            <div className="card w-full shadow-xl mt-20">
-                <div className="card-body w-full" style={{ height: 500 }}>
-                    <h2 className="card-title">Total {projectId} events / {day} day</h2>
+            <h1 className="mt-8 text-5xl font-bold">ProjectId: {projectId}</h1>
+            <div className="w-full mt-20 shadow-xl card">
+                <div className="w-full card-body" style={{ height: 500 }}>
+                    <h2 className="card-title">
+                        Total {projectId} events / {day} day
+                    </h2>
                     <ResponsiveContainer width="100%" height="100%">
                         <LineChart
                             width={500}
@@ -111,26 +135,36 @@ const PorjectDetail: FC = () => {
                                 top: 5,
                                 right: 50,
                                 left: 0,
-                                bottom: 0,
-                            }}
-                        >
+                                bottom: 0
+                            }}>
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis dataKey="time" interval="preserveStart" />
                             <YAxis />
                             <Tooltip />
                             <Legend />
-                            <Line type="monotone" dataKey="counts" stroke="#8884d8" activeDot={{ r: 8 }} />
+                            <Line
+                                type="monotone"
+                                dataKey="counts"
+                                stroke="#8884d8"
+                                activeDot={{ r: 8 }}
+                            />
                         </LineChart>
                     </ResponsiveContainer>
                     <div className="flex justify-end space-x-3">
-                        <button className="btn btn-primary" onClick={() => setDay(7)}>7d</button>
-                        <button className="btn btn-primary" onClick={() => setDay(30)}>30d</button>
-                        <button className="btn btn-primary" onClick={() => setDay(90)}>90d</button>
+                        <button className="btn btn-primary" onClick={() => setDay(7)}>
+                            7d
+                        </button>
+                        <button className="btn btn-primary" onClick={() => setDay(30)}>
+                            30d
+                        </button>
+                        <button className="btn btn-primary" onClick={() => setDay(90)}>
+                            90d
+                        </button>
                     </div>
                 </div>
             </div>
-            <div className="overflow-x-auto mt-20">
-                <table className="table table-zebra w-full">
+            <div className="mt-20 overflow-x-auto">
+                <table className="table w-full table-zebra">
                     <thead>
                         <tr>
                             <th />
@@ -142,24 +176,20 @@ const PorjectDetail: FC = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {
-                            logs.map((v: LogObject, i) => {
-                                return (
-                                    <tr key={v.id}>
-                                        <th>{i + 1}</th>
-                                        <td>{v.project_id}</td>
-                                        <td>{v.event_key}</td>
-                                        <td>{v.event_value}</td>
-                                        <td><Link
-                                            to={`/caller/${v.caller}`}
-                                        >
-                                            {v.caller}
-                                        </Link></td>
-                                        <td>{v.create_at}</td>
-                                    </tr>
-                                )
-                            })
-                        }
+                        {logs.map((v: LogObject, i) => {
+                            return (
+                                <tr key={v.id}>
+                                    <th>{i + 1}</th>
+                                    <td>{v.project_id}</td>
+                                    <td>{v.event_key}</td>
+                                    <td>{v.event_value}</td>
+                                    <td>
+                                        <Link to={`/caller/${v.caller}`}>{v.caller}</Link>
+                                    </td>
+                                    <td>{v.create_at}</td>
+                                </tr>
+                            )
+                        })}
                     </tbody>
                 </table>
                 <div className="flex justify-end pt-10">
@@ -172,7 +202,7 @@ const PorjectDetail: FC = () => {
                         pageSizeOptions={[10, 20, 50, 100]}
                         showSizeChanger
                         showQuickJumper
-                        showTotal={total => `Total ${total} items`}
+                        showTotal={(total) => `Total ${total} items`}
                     />
                 </div>
             </div>
