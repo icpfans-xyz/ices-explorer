@@ -46,8 +46,8 @@ const PorjectDetail: FC = () => {
         const query = gql`
         query MyQuery {
             event_log_test(order_by: {time: desc}, limit: ${offset}, offset: ${
-            offset * currentPage
-        }, where: {caller: {_eq: "${callerId}"}}) {
+    offset * currentPage
+}, where: {caller: {_eq: "${callerId}"}}) {
                 id
                 caller
                 event_value
