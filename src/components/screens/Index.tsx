@@ -1,137 +1,165 @@
 import { Head } from '~/components/shared/Head'
-import { FC, useEffect, useState } from 'react'
-import { GraphQLClient, gql } from 'graphql-request'
-import { Area, AreaChart, XAxis, ResponsiveContainer } from 'recharts'
+import { useEffect, useState } from 'react'
+import { gql } from 'graphql-request'
+import { Area, AreaChart, ResponsiveContainer, Tooltip } from 'recharts'
 import { Table } from 'antd'
 import { Link } from 'react-router-dom'
-const endpoint = 'https://graph.ices.one/v1/graphql'
-
-const graphQLClient = new GraphQLClient(endpoint, {
-    headers: {
-        'content-type': 'application/json',
-        'x-hasura-admin-secret': 'df8UEfMjqN6apt'
-    }
-})
+import { graphQLClient } from '~/config'
 
 const columns = [
-    { title: 'PROJECT_ID', dataIndex: 'project_id', key: 'project_id' },
-    Table.EXPAND_COLUMN,
+    { title: 'Block', dataIndex: 'block', key: 'block' },
     { title: 'EVENT_TYPE', dataIndex: 'event_key', key: 'event_key' },
-    // Table.SELECTION_COLUMN,
+    // { title: 'TYPE', dataIndex: 'type', key: 'type' },
+    Table.EXPAND_COLUMN,
     { title: 'EVENT_VALUE', dataIndex: 'event_value', key: 'event_value' },
-    { title: 'CANISTER_ID', dataIndex: 'caller', key: 'caller', render: text => <Link to={`/canister/${text}`}>{text}</Link> },
-    // Table.SELECTION_COLUMN,
-    { title: 'CREATE_TIME', dataIndex: 'time', key: 'time' }
+    { title: 'Caller', dataIndex: 'caller', key: 'caller'},
+    { title: 'CANISTER_ID', dataIndex: 'canister_id', key: 'canister_id', render: (text: string) => <Link to={`/canister/${text}`}>{text}</Link> },
+    { title: 'CREATE_TIME', dataIndex: 'ices_time', key: 'ices_time' }
 ]
-const Index: FC = () => {
+const Index = () => {
     const [logs, setLogs] = useState([])
     // const [day, setDay] = useState(7)
-    const [lineData] = useState([
-        {
-            name: '3-4',
-            uv: 4000,
-            pv: 2400,
-            amt: 2400,
-        },
-        {
-            name: 'Page B',
-            uv: 3000,
-            pv: 1398,
-            amt: 2210,
-        },
-        {
-            name: 'Page C',
-            uv: 2000,
-            pv: 9800,
-            amt: 2290,
-        },
-        {
-            name: 'Page D',
-            uv: 2780,
-            pv: 3908,
-            amt: 2000,
-        },
-        {
-            name: 'Page E',
-            uv: 1890,
-            pv: 4800,
-            amt: 2181,
-        },
-        {
-            name: 'Page F',
-            uv: 2390,
-            pv: 3800,
-            amt: 2500,
-        },
-        {
-            name: '3-10',
-            uv: 3490,
-            pv: 4300,
-            amt: 2100,
-        }
-    ])
+    const [eventCount7d, setEventCount7d] = useState([])
+    const [eventCountAll, setEventCountAll] = useState(0)
+    const [canisterCount7d, setCanisterCount7d] = useState([])
+    const [canisterCountAll, setCanisterCountAll] = useState(0)
+    const [callerCount7d, setCallerCount7d] = useState([])
+    const [callerCountAll, setCallerCountAll] = useState(0)
     const [currentPage, setPage] = useState(1)
     const [offset, setOffset] = useState(10)
     const [total, setTotal] = useState(0)
-    function changeSize(current, size) {
-        setOffset(size)
-    }
-    async function getData() {
+
+    async function getEventCounts7d() {
         const query = gql`
         query MyQuery {
-            event_log_test(order_by: {time: desc}, limit: ${offset}, offset: ${
-    offset * currentPage
-}) {
-                id
-                caller
-                event_value
-                event_key
-                project_id
+            v1_all_event_count_7d {
+                counts
                 time
-                create_at
-                timestamp
             }
         }`
-
         const res = await graphQLClient.request(query)
-        setLogs(res.event_log_test.map((v, i) => {
+        setEventCount7d(res.v1_all_event_count_7d)
+        // return res.v1_all_caller_count_7d
+    }
+    async function getEventCountAll() {
+        const query = gql`
+        query MyQuery {
+            t_event_logs_v1_aggregate {
+                aggregate {
+                    count
+                }
+            }
+        }`
+        const res = await graphQLClient.request(query)
+        setEventCountAll(res.t_event_logs_v1_aggregate.aggregate.count)
+    }
+
+    async function getCanisterCounts7d() {
+        const query = gql`
+        query MyQuery {
+            v1_all_canister_count_7d {
+                counts
+                time
+            }
+        }`
+        const res = await graphQLClient.request(query)
+        setCanisterCount7d(res.v1_all_canister_count_7d)
+        // return res.v1_all_caller_count_7d
+    }
+    async function getCanisterCountAll() {
+        const query = gql`
+        query MyQuery {
+            v1_canister_event_count_7d_aggregate {
+                aggregate {
+                    count(columns: counts)
+                }
+            }
+        }`
+        const res = await graphQLClient.request(query)
+        setCanisterCountAll(res.v1_canister_event_count_7d_aggregate.aggregate.count)
+    }
+
+    async function getCallerCounts7d() {
+        const query = gql`
+        query MyQuery {
+            v1_all_caller_count_7d {
+                counts
+                time
+            }
+        }`
+        const res = await graphQLClient.request(query)
+        setCallerCount7d(res.v1_all_caller_count_7d)
+        // return res.v1_all_caller_count_7d
+    }
+    async function getCallerCountAll() {
+        const query = gql`
+        query MyQuery {
+            v1_all_caller_count_7d_aggregate {
+                aggregate {
+                    count(columns: counts)
+                }
+            }
+        }`
+        const res = await graphQLClient.request(query)
+        setCallerCountAll(res.v1_all_caller_count_7d_aggregate.aggregate.count)
+    }
+
+    function changeSize(current, size) {
+        console.log(current, size)
+        setOffset(size)
+    }
+    
+    async function getEventLogAll() {
+        const query = gql`
+        query MyQuery {
+            t_event_logs_v1(order_by: {ices_time: desc}, limit: ${offset}, offset: ${offset * (currentPage - 1)}) {
+                block
+                caller
+                caller_time
+                canister_id
+                event_key
+                event_value
+                from_addr
+                global_id
+                ices_time
+                id
+                nonce
+                to_addr
+                type
+            }
+        }`
+        const res = await graphQLClient.request(query)
+        console.log(res)
+        setLogs(res.t_event_logs_v1.map((v, i) => {
             v.key = i + 1
             return v
         }))
     }
-    // async function getAllcountsByDay() {
-    //     const query = gql`
-    //     query MyQuery {
-    //         data_day_${day}d_counts {
-    //             counts
-    //             time
-    //         }
-    //     }`
-
-    //     const res = await graphQLClient.request(query)
-    //     setLineData(res[`data_day_${day}d_counts`])
-    // }
-    // function pageChange(p) {
-    //     console.log(p)
-    // }
     async function getLogTotal() {
         const query = gql`
-            query MyQuery {
-                event_log_test_aggregate {
-                    aggregate {
-                        count
-                    }
+        query MyQuery {
+            t_event_logs_v1_aggregate {
+                aggregate {
+                    count
                 }
             }
-        `
+        }`
+
         const res = await graphQLClient.request(query)
-        setTotal(res.event_log_test_aggregate.aggregate.count)
+        setTotal(res.t_event_logs_v1_aggregate.aggregate.count)
     }
+
     useEffect(() => {
-        getData()
+        getEventLogAll()
     }, [currentPage, offset])
     useEffect(() => {
         getLogTotal()
+        getEventCountAll()
+        getEventCounts7d()
+        getCanisterCountAll()
+        getCanisterCounts7d()
+        getCallerCounts7d()
+        getCallerCountAll()
     }, [])
 
     // useEffect(() => {
@@ -141,7 +169,7 @@ const Index: FC = () => {
     return (
         <>
             <Head title="ICES | Event LOG" />
-            <div className="form-control">
+            <div className="form-control w-3/4 pt-20">
                 <div className="input-group">
                     <input type="text" placeholder="Search by Canister Id, Principal Id" className="input input-bordered w-full h-16 text-xl" />
                     <button className="btn btn-square h-16 w-20">
@@ -155,94 +183,96 @@ const Index: FC = () => {
                 <div className="card w-full h-full bg-base-100 shadow-xl">
                     <div className="card-body pb-0 pt-5">
                         <h2 className="card-title mb-0 text-gray-400">Events</h2>
-                        <h1 className="text-4xl font-bold my-0">123,123</h1>
-                        <p className="text-lg my-0">+2,554 24h</p>
-                        <ResponsiveContainer width="100%" height="100%">
+                        <h1 className="text-4xl font-bold my-0">{eventCountAll.toLocaleString('en-US')}</h1>
+                        {eventCount7d.length > 0 && <p className="text-lg my-0 text-lime-500 flex justify-between"><span className="inline-block font-bold text-xl">+{eventCount7d[eventCount7d.length - 1].counts}</span> <i className="text-gray-300">24h</i></p>}
+                        <ResponsiveContainer width="100%" height={50}>
                             <AreaChart
                                 height={100}
-                                data={lineData}
+                                data={eventCount7d}
                                 margin={{
                                     top: 0,
-                                    right: 15,
-                                    left: 15,
+                                    right: 0,
+                                    left: 0,
                                     bottom: 0,
                                 }}
                             >
-                                <XAxis dataKey="name" interval={5} axisLine={false} tickLine={false} />
-                                <Area type="monotone" dataKey="pv" stroke="#82ca9d" fill="#82ca9d" minTickGap="6" />
-                                {/* <Line type="monotone" dataKey="pv" stroke="#8884d8" strokeWidth={4} /> */}
+                                {/* <XAxis dataKey="time" interval={5} axisLine={false} tickLine={false} /> */}
+                                <Tooltip />
+                                <Area type="monotone" dataKey="counts" stroke="#82ca9d" fill="#82ca9d" />
+                                {/* <Line type="monotone" dataKey="counts" stroke="#8884d8" strokeWidth={4} /> */}
                             </AreaChart>
                         </ResponsiveContainer>
+                        {eventCount7d.length > 0 && <p className="flex justify-between"><span>{eventCount7d[0].time}</span><span>{eventCount7d[eventCount7d.length - 1].time}</span></p>}
                     </div>
                 </div>
                 <div className="card w-full h-full bg-base-100 shadow-xl">
                     <div className="card-body pb-0 pt-5">
                         <h2 className="card-title mb-0 text-gray-400">Integrated Canisters</h2>
-                        <h1 className="text-4xl font-bold my-0">123,123</h1>
-                        <p className="text-lg my-0">+2,554 24h</p>
-                        <ResponsiveContainer width="100%" height="100%">
+                        <h1 className="text-4xl font-bold my-0">{canisterCountAll.toLocaleString('en-US')}</h1>
+                        {canisterCount7d.length > 0 && <p className="text-lg my-0 text-lime-500 flex justify-between"><span className="inline-block font-bold text-xl">+{canisterCount7d[canisterCount7d.length - 1].counts}</span> <i className="text-gray-300">24h</i></p>}
+                        <ResponsiveContainer width="100%" height={50}>
                             <AreaChart
                                 height={100}
-                                data={lineData}
+                                data={canisterCount7d}
                                 margin={{
                                     top: 0,
-                                    right: 15,
-                                    left: 15,
-                                    bottom: 0,
-                                }}
-                            >
-                                <XAxis dataKey="name" interval={5} axisLine={false} tickLine={false} />
-                                <Area type="monotone" dataKey="pv" stroke="#abca82" fill="#4ca1ea" minTickGap="6" />
+                                    right: 0,
+                                    left: 0,
+                                    bottom: 0}}>
+                                {/* <XAxis dataKey="name" interval={5} axisLine={false} tickLine={false} /> */}
+                                <Tooltip />
+                                <Area type="monotone" dataKey="counts" stroke="#2789f1" fill="#4ca1ea" />
                                 {/* <Line type="monotone" dataKey="pv" stroke="#8884d8" strokeWidth={4} /> */}
                             </AreaChart>
                         </ResponsiveContainer>
+                        {canisterCount7d.length > 0 && <p className="flex justify-between"><span>{canisterCount7d[0].time}</span><span>{canisterCount7d[canisterCount7d.length - 1].time}</span></p>}
                     </div>
                 </div>
                 <div className="card w-full h-full bg-base-100 shadow-xl">
                     <div className="card-body pb-0 pt-5">
                         <h2 className="card-title mb-0 text-gray-400">Caller</h2>
-                        <h1 className="text-4xl font-bold my-0">123,123</h1>
-                        <p className="text-lg my-0">+2,554 24h</p>
-                        <ResponsiveContainer width="100%" height="100%">
+                        <h1 className="text-4xl font-bold my-0">{callerCountAll.toLocaleString('en-US')}</h1>
+                        {callerCount7d.length > 0 && <p className="text-lg my-0 text-lime-500 flex justify-between"><span className="inline-block font-bold text-xl">+{callerCount7d[callerCount7d.length - 1].counts}</span> <i className="text-gray-300">24h</i></p>}
+                        <ResponsiveContainer width="100%" height={50}>
                             <AreaChart
                                 height={100}
-                                data={lineData}
+                                data={callerCount7d}
                                 margin={{
                                     top: 0,
-                                    right: 15,
-                                    left: 15,
-                                    bottom: 0,
-                                }}
-                            >
-                                <XAxis dataKey="name" interval={5} axisLine={false} tickLine={false} />
-                                <Area type="monotone" dataKey="uv" stroke="#f33968" fill="#f279ee" minTickGap="6" />
+                                    right: 0,
+                                    left: 0,
+                                    bottom: 0}}>
+                                {/* <XAxis dataKey="name" interval={5} axisLine={false} tickLine={false} /> */}
+                                <Tooltip />
+                                <Area type="monotone" dataKey="counts" stroke="#f33968" fill="#f279ee" />
                                 {/* <Line type="monotone" dataKey="pv" stroke="#8884d8" strokeWidth={4} /> */}
                             </AreaChart>
                         </ResponsiveContainer>
+                        {callerCount7d.length > 0 && <p className="flex justify-between"><span>{callerCount7d[0].time}</span><span>{callerCount7d[callerCount7d.length - 1].time}</span></p>}
                     </div>
                 </div>
             </div>
-            <div className="card w-full bg-base-100 mt-20 shadow-xl">
+            <h2 className="card-title mt-20">Lates Events</h2>
+            <div className="card w-full bg-base-100 shadow-xl">
                 <div className="card-body">
-                    <h2 className="card-title">Lates Events</h2>
                     <Table
                         columns={columns}
                         // rowSelection={{}}
                         expandable={{
                             expandRowByClick: true,
                             showExpandColumn: false,
-                            rowExpandable: record => record.event_key === 'trans',
+                            rowExpandable: record => ['Transfer', 'Sale', 'Mint'].includes(record.type),
                             expandedRowRender: record => <p style={{ margin: 0 }}>{record.event_value}</p>,
                             // expandedRowKeys: ['event_key']
                         }}
                         pagination={{
                             current: currentPage,
                             total: total,
-                            pageSize: 10,
+                            pageSize: offset,
                             // itemRender={PageItem}
                             onShowSizeChange: changeSize,
                             onChange: setPage,
-                            pageSizeOptions: [10, 20, 50, 100],
+                            pageSizeOptions: [10, 30, 50, 100],
                             // hideOnSinglePage={false}
                             showSizeChanger: true,
                             showQuickJumper: true,

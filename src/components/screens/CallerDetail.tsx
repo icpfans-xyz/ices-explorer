@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { GraphQLClient, gql } from 'graphql-request'
+import { gql } from 'graphql-request'
 import {
     LineChart,
     Line,
@@ -12,14 +12,8 @@ import {
     ResponsiveContainer
 } from 'recharts'
 import { Pagination } from 'antd'
-import { endpoint } from 'config'
+import { graphQLClient } from '~/config'
 
-const graphQLClient = new GraphQLClient(endpoint, {
-    headers: {
-        'content-type': 'application/json',
-        'x-hasura-admin-secret': 'df8UEfMjqN6apt'
-    }
-})
 type LogObject = {
     id: number
     caller: string
