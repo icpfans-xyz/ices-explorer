@@ -1,8 +1,8 @@
-import { useEffect, useState, FC } from 'react'
+import { useEffect, useState, FC, SyntheticEvent, ChangeEvent } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { gql } from 'graphql-request'
 import {
-    Area, LineChart, ResponsiveContainer, Tooltip, XAxis, CartesianGrid,
+    LineChart, ResponsiveContainer, Tooltip, XAxis, CartesianGrid,
     YAxis,
     Legend,
     Line
@@ -13,6 +13,7 @@ import { graphQLClient } from '~/config'
 import { Head } from '~/components/shared/Head'
 import icrock from '~/assets/images/ic-rocks.png'
 import icp123 from '~/assets/images/icp123.png'
+import { LogType, EventKey, CanisterEventKey, EventKeys } from './type'
 // import { debounce } from '~/lib/util'
 const { Option } = Select
 // interface EventKey {
@@ -35,23 +36,22 @@ const columns = [
 
 const CanisterDetail: FC = () => {
     const { canisterId } = useParams()
-    const [logs, setLogs] = useState([])
+    const [logs, setLogs] = useState<LogType[]>([])
     const [eventCount7d, setEventCount7d] = useState([])
     const [eventCountAll, setEventCountAll] = useState(0)
     const [callerCount7d, setCallerCount7d] = useState([])
-    const [callerCountAll, setCallerCountAll] = useState(0)
+    const [callerCountAll, setCallerCountAll] = useState<number>(0)
     const [currentPage, setPage] = useState < number > (1)
     const [offset, setOffset] = useState < number > (10)
     const [total, setTotal] = useState < number > (0)
-    const [eventKeys, setEventKeys] = useState([])
+    const [eventKeys, setEventKeys] = useState<EventKeys[]>([])
     const [eventKeyPage, setEventKeyPage] = useState < number > (1)
-    const [queryEventKeys, setQueryEventKeys] = useState([])
+    const [queryEventKeys, setQueryEventKeys] = useState<EventKey[]>([])
     const [orParams, setOrParams] = useState('')
     const [tabIndex, setTabIndex] = useState(0)
     function changeSize(current: number, size: number) {
         setOffset(size)
     }
-    const data = [{'counts':199,'time':'2022-03-17'}, {'counts':178,'time':'2022-03-18'}, {'counts':120,'time':'2022-03-19'}, {'counts':79,'time':'2022-03-20'}, {'counts':87,'time':'2022-03-21'}, {'counts':83,'time':'2022-03-22'}, {'counts':76,'time':'2022-03-23'}]
     async function getEventLogAll() {
         const query = gql`
         query MyQuery {
@@ -76,7 +76,7 @@ const CanisterDetail: FC = () => {
         // }
         const res = await graphQLClient.request(query)
 
-        setLogs(res.t_event_logs_v1.map((v, i) => {
+        setLogs(res.t_event_logs_v1.map((v: LogType, i: number) => {
             v.key = i + 1
             return v
         }))
@@ -166,12 +166,7 @@ const CanisterDetail: FC = () => {
             }
         }`
         const res = await graphQLClient.request(query)
-        const treeData = res.v1_canister_event_key_group.map(v => {
-            // console.log({
-            //     title: v.event_key,
-            //     value: v.event_key,
-            //     key: v.event_key
-            // })
+        const treeData: EventKeys[] = res.v1_canister_event_key_group.map((v: CanisterEventKey) => {
             return {
                 title: v.event_key,
                 value: v.event_key,
@@ -187,15 +182,15 @@ const CanisterDetail: FC = () => {
 
     }
     const [andParams, setAndParams] = useState('')
-    function inputChange(e) {
+    function inputChange(e: ChangeEvent<HTMLInputElement>) {
         if (e.target.value !== '') {
             setAndParams(`,_and: {caller: {_eq: ${e.target.value}}}`)
         } else {
             setAndParams('')
         }
     }
-    function handleChange(arr) {
-        const keys = arr.map(v => {
+    function handleChange(arr: string[]) {
+        const keys: EventKey[] = arr.map(v => {
             return {
                 event_key: {
                     _eq: v
@@ -215,14 +210,12 @@ const CanisterDetail: FC = () => {
     //     getEventKeys()
     // }, [eventKeyPage])
 
-    function disabledDate(current: number) {
+    function disabledDate(current: moment.Moment) {
         // Can not select days before today and today
         return current && current < moment().endOf('day')
     }
-    function onScroll(e) {
-        const target = e.target
-        // console.log(target.scrollTop, target.offsetHeight, target.scrollHeight)
-        if (target.scrollTop + target.offsetHeight === target.scrollHeight) {
+    function onScroll(e: SyntheticEvent<HTMLDivElement>) {
+        if (e.currentTarget.scrollTop + e.currentTarget.offsetHeight === e.currentTarget.scrollHeight) {
             getEventKeys()
             // setEventKeyPage(eventKeyPage + 1)
             // debounce(()=> {
@@ -325,7 +318,7 @@ const CanisterDetail: FC = () => {
                         <div className="card bg-base-100 glass p-5">
                             <div className="card-body p-0 w-40">
                                 <h2 className="card-title mb-0 text-gray-400">Total Callers</h2>
-                                <h1 className="text-4xl font-bold my-0">{eventCountAll}</h1>
+                                <h1 className="text-4xl font-bold my-0">{callerCountAll}</h1>
                                 <p className="text-lg my-0 text-lime-500 flex justify-between"><span className="inline-block font-bold text-xl">+75</span> <i className="text-gray-300">24h</i></p>
                                 {/* <ResponsiveContainer width="100%" height={50}>
                                     <AreaChart
@@ -479,8 +472,8 @@ const CanisterDetail: FC = () => {
                                 expandable={{
                                     // expandRowByClick: true,
                                     showExpandColumn: false,
-                                    rowExpandable: record => ['Transfer', 'Sale', 'Mint'].includes(record.type),
-                                    expandedRowRender: record => <p style={{ margin: 0 }}>{record.event_value}</p>,
+                                    rowExpandable: (record: LogType) => ['Transfer', 'Sale', 'Mint'].includes(record.type),
+                                    expandedRowRender: (record: LogType ) => <p style={{ margin: 0 }}>{record.event_value}</p>,
                                     // expandedRowKeys: ['event_key']
                                 }}
                                 pagination={{
@@ -507,7 +500,7 @@ const CanisterDetail: FC = () => {
                 <div className="card w-full bg-base-100 pt-10 glass">
                     <div className="flex justify-between">
                         <h2 className="card-title mb-0 text-gray-600 pl-10 text-2xl">Events</h2>
-                        <div className="pr-10 space-x-2">
+                        <div className="pr-12 space-x-2">
                             <button className="btn btn-primary btn-sm btn-outline">24H</button>
                             <button className="btn btn-primary btn-sm">7D</button>
                             <button className="btn btn-primary btn-sm btn-outline">30D</button>
@@ -518,12 +511,12 @@ const CanisterDetail: FC = () => {
                         <LineChart
                             width={500}
                             height={400}
-                            data={data}
+                            data={eventCount7d}
                             margin={{
                                 top: 20,
-                                right: 40,
+                                right: 50,
                                 bottom: 20,
-                                left: 20,
+                                left: 5,
                             }}
                         >
                             <CartesianGrid stroke="#ccc" strokeDasharray="3 3" />
@@ -539,7 +532,7 @@ const CanisterDetail: FC = () => {
                 <div className="card w-full bg-base-100 mt-10 pt-10 glass">
                     <div className="flex justify-between">
                         <h2 className="card-title mb-0 text-gray-600 pl-10 text-2xl">Callers</h2>
-                        <div className="pr-10 space-x-2">
+                        <div className="pr-12 space-x-2">
                             <button className="btn btn-primary btn-sm btn-outline">24H</button>
                             <button className="btn btn-primary btn-sm">7D</button>
                             <button className="btn btn-primary btn-sm btn-outline">30D</button>
@@ -550,12 +543,12 @@ const CanisterDetail: FC = () => {
                         <LineChart
                             width={500}
                             height={400}
-                            data={data}
+                            data={callerCount7d}
                             margin={{
                                 top: 20,
-                                right: 40,
+                                right: 50,
                                 bottom: 20,
-                                left: 20,
+                                left: 5,
                             }}
                         >
                             <CartesianGrid stroke="#ccc" strokeDasharray="3 3" />
@@ -564,7 +557,7 @@ const CanisterDetail: FC = () => {
                             <Tooltip />
                             <Legend />
                             {/* <Area type="monotone" dataKey="amt" fill="#8884d8" stroke="#8884d8" /> */}
-                            <Line type="monotone" dataKey="counts" stroke="#82ca9d"  strokeWidth={2} />
+                            <Line type="monotone" dataKey="counts" stroke="#f33968"  strokeWidth={2} />
                         </LineChart>
                     </ResponsiveContainer>
                 </div>

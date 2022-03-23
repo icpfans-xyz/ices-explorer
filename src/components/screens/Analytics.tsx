@@ -69,10 +69,10 @@ export default function Analytics() {
                 <div className="flex justify-between">
                     <h2 className="card-title mb-0 text-gray-600 pl-10 text-2xl">Events</h2>
                     <div className="pr-10 space-x-2">
-                        <button className="btn btn-primary btn-sm btn-outline">24H</button>
-                        <button className="btn btn-primary btn-sm">7D</button>
-                        <button className="btn btn-primary btn-sm btn-outline">30D</button>
-                        <button className="btn btn-primary btn-sm btn-outline">All</button>
+                        <button className="btn btn-sm btn-outline base-200">24H</button>
+                        <button className="btn btn-sm base-100">7D</button>
+                        <button className="btn btn-sm btn-outline">30D</button>
+                        <button className="btn btn-sm btn-outline">All</button>
                     </div>
                 </div>
                 <ResponsiveContainer width="100%" height={450}>
@@ -101,10 +101,10 @@ export default function Analytics() {
                 <div className="flex justify-between">
                     <h2 className="card-title mb-0 text-gray-600 pl-10 text-2xl">Integrated Canisters</h2>
                     <div className="pr-10 space-x-2">
-                        <button className="btn btn-primary btn-sm btn-outline">24H</button>
-                        <button className="btn btn-primary btn-sm">7D</button>
-                        <button className="btn btn-primary btn-sm btn-outline">30D</button>
-                        <button className="btn btn-primary btn-sm btn-outline">All</button>
+                        <button className="btn btn-sm btn-outline base-200">24H</button>
+                        <button className="btn btn-sm base-100">7D</button>
+                        <button className="btn btn-sm btn-outline">30D</button>
+                        <button className="btn btn-sm btn-outline">All</button>
                     </div>
                 </div>
                 <ResponsiveContainer width="100%" height={450}>
@@ -133,10 +133,10 @@ export default function Analytics() {
                 <div className="flex justify-between">
                     <h2 className="card-title mb-0 text-gray-600 pl-10 text-2xl">Callers</h2>
                     <div className="pr-10 space-x-2">
-                        <button className="btn btn-primary btn-sm btn-outline">24H</button>
-                        <button className="btn btn-primary btn-sm">7D</button>
-                        <button className="btn btn-primary btn-sm btn-outline">30D</button>
-                        <button className="btn btn-primary btn-sm btn-outline">All</button>
+                        <button className="btn btn-sm btn-outline base-200">24H</button>
+                        <button className="btn btn-sm base-100">7D</button>
+                        <button className="btn btn-sm btn-outline">30D</button>
+                        <button className="btn btn-sm btn-outline">All</button>
                     </div>
                 </div>
                 <ResponsiveContainer width="100%" height={450}>

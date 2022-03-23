@@ -33,7 +33,7 @@ const PorjectDetail: FC = () => {
     const [currentPage, setPage] = useState<number>(1)
     const [offset, setOffset] = useState<number>(10)
     const [total, setTotal] = useState<number>(0)
-    function changeSize(current, size) {
+    function changeSize(current: number, size: number) {
         setOffset(size)
     }
     async function getData() {

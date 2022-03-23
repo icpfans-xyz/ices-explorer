@@ -5,7 +5,7 @@ import { Area, AreaChart, ResponsiveContainer, Tooltip } from 'recharts'
 import { Table } from 'antd'
 import { Link } from 'react-router-dom'
 import { graphQLClient } from '~/config'
-
+import { LogType, EventCountType } from './type'
 const columns = [
     { title: 'Block', dataIndex: 'block', key: 'block' },
     { title: 'EVENT_TYPE', dataIndex: 'event_key', key: 'event_key' },
@@ -17,13 +17,13 @@ const columns = [
     { title: 'CREATE_TIME', dataIndex: 'ices_time', key: 'ices_time' }
 ]
 const Index = () => {
-    const [logs, setLogs] = useState([])
+    const [logs, setLogs] = useState<LogType[]>([])
     // const [day, setDay] = useState(7)
-    const [eventCount7d, setEventCount7d] = useState([])
+    const [eventCount7d, setEventCount7d] = useState<EventCountType[]>([])
     const [eventCountAll, setEventCountAll] = useState(0)
-    const [canisterCount7d, setCanisterCount7d] = useState([])
+    const [canisterCount7d, setCanisterCount7d] = useState<EventCountType[]>([])
     const [canisterCountAll, setCanisterCountAll] = useState(0)
-    const [callerCount7d, setCallerCount7d] = useState([])
+    const [callerCount7d, setCallerCount7d] = useState<EventCountType[]>([])
     const [callerCountAll, setCallerCountAll] = useState(0)
     const [currentPage, setPage] = useState(1)
     const [offset, setOffset] = useState(10)
@@ -104,7 +104,7 @@ const Index = () => {
         setCallerCountAll(res.v1_all_caller_count_7d_aggregate.aggregate.count)
     }
 
-    function changeSize(current, size) {
+    function changeSize(current: number, size: number) {
         console.log(current, size)
         setOffset(size)
     }
@@ -129,8 +129,7 @@ const Index = () => {
             }
         }`
         const res = await graphQLClient.request(query)
-        console.log(res)
-        setLogs(res.t_event_logs_v1.map((v, i) => {
+        setLogs(res.t_event_logs_v1.map((v: LogType, i: number) => {
             v.key = i + 1
             return v
         }))
@@ -172,7 +171,7 @@ const Index = () => {
             <div className="form-control w-3/4 pt-20">
                 <div className="input-group">
                     <input type="text" placeholder="Search by Canister Id, Principal Id" className="input input-bordered w-full h-16 text-xl" />
-                    <button className="btn btn-square h-16 w-20">
+                    <button className="btn btn-square h-16 w-20 bg-gray-400 border-gray-400">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
