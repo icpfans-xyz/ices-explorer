@@ -8,12 +8,12 @@ import {
     Line
 } from 'recharts'
 import moment from 'moment'
-import { Table, Select, Form, Input, DatePicker, Space, Row, Col, Button } from 'antd'
+import { Table, Select, Form, Input, DatePicker, Space, Row, Col, Button, Tag } from 'antd'
 import { graphQLClient } from '~/config'
 import { Head } from '~/components/shared/Head'
 import icrock from '~/assets/images/ic-rocks.png'
 import icp123 from '~/assets/images/icp123.png'
-import { LogType, EventKey, CanisterEventKey, EventKeys } from './type'
+import { LogType, EventKey, CanisterEventKey, EventKeys, EventValue } from './type'
 import { shortAccount } from '~/lib/util'
 // import { debounce } from '~/lib/util'
 const { Option } = Select
@@ -23,17 +23,70 @@ const { Option } = Select
 // }
 
 const { RangePicker } = DatePicker
+// const columns = [
+//     { title: 'BLOCK', dataIndex: 'block', key: 'block' },
+//     { width: 120, title: 'CANISTER ID', dataIndex: 'canister_id', key: 'canister_id', render: (text: string) => <Link to={`/canister/${text}`}>{shortAccount(text)}</Link> },
+//     { title: 'EVENT KEY', dataIndex: 'event_key', key: 'event_key' },
+//     // { title: 'TYPE', dataIndex: 'type', key: 'type' },
+//     Table.EXPAND_COLUMN,
+//     { title: 'EVENT VALUE', dataIndex: 'event_value', key: 'event_value' },
+//     { width: 120, title: 'CALLER', dataIndex: 'caller', key: 'caller', render: (text: string) => <Link to={`/canister/${text}`}>{shortAccount(text)}</Link> },
+//     { title: 'CREATE TIME', dataIndex: 'ices_time', key: 'ices_time' }
+// ]
 const columns = [
-    { title: 'BLOCK', dataIndex: 'block', key: 'block' },
-    { width: 120, title: 'CANISTER ID', dataIndex: 'canister_id', key: 'canister_id', render: (text: string) => <Link to={`/canister/${text}`}>{shortAccount(text)}</Link> },
+    { title: 'INDEX', dataIndex: 'block', key: 'block' },
+    {
+        title: 'CANISTER ID',
+        dataIndex: 'canister_id',
+        key: 'canister_id',
+        render: (text: string) => <Link to={`/canister/${text}`}>{shortAccount(text)}</Link>
+    },
     { title: 'EVENT KEY', dataIndex: 'event_key', key: 'event_key' },
-    // { title: 'TYPE', dataIndex: 'type', key: 'type' },
-    Table.EXPAND_COLUMN,
-    { title: 'EVENT VALUE', dataIndex: 'event_value', key: 'event_value' },
-    { width: 120, title: 'CALLER', dataIndex: 'caller', key: 'caller', render: (text: string) => <Link to={`/canister/${text}`}>{shortAccount(text)}</Link> },
-    { title: 'CREATE TIME', dataIndex: 'ices_time', key: 'ices_time' }
-]
+    {
+        title: 'EVENT VALUE',
+        dataIndex: 'event_value',
+        key: 'event_value',
+        render: (values: string) => {
+            try {
+                const arr = JSON.parse(values)
+                console.log(typeof arr)
+                console.log(arr)
 
+                return arr.map((item: EventValue, index: number) => {
+                    return (
+                        <div key={index}>
+                            <Tag key={item.sub_key}>{item.sub_key}</Tag>
+
+                            {item.sub_key === 'from' || item.sub_key === 'to' ? (
+                                <a
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    href={`https://ic.rocks/principal/${item.sub_value}`}>
+                                    {shortAccount(item.sub_value)}
+                                </a>
+                            ) : (
+                                item.sub_value
+                            )}
+                        </div>
+                    )
+                })
+            } catch (err) {
+                console.log(err)
+            }
+        }
+    },
+    {
+        title: 'CALLER',
+        dataIndex: 'caller',
+        key: 'caller',
+        render: (text: string) => (
+            <a target="_blank" rel="noreferrer" href={`https://ic.rocks/principal/${text}`}>
+                {shortAccount(text)}
+            </a>
+        )
+    },
+    { title: 'TIME', dataIndex: 'ices_time', key: 'ices_time' }
+]
 const CanisterDetail: FC = () => {
     const { canisterId } = useParams()
     const [logs, setLogs] = useState<LogType[]>([])
@@ -251,7 +304,7 @@ const CanisterDetail: FC = () => {
     }, [])
     return (
         <>
-            <Head title={`ICES - ${canisterId} events`} />
+            <Head title={`ICES - Canister Details | ${canisterId} Details`} />
             <Link
                 className="flex items-center text-lg py-6"
                 to="/"
@@ -394,7 +447,7 @@ const CanisterDetail: FC = () => {
                 {
                     ['Events', 'Analytics'].map((v, i) => {
                         return (
-                            <a onClick={() => setTabIndex(i)} key={v} className={`tab tab-bordered ${i === tabIndex ? 'tab-active' : ''}`}>{v}</a>
+                            <a onClick={() => setTabIndex(i)} key={v} className={`tab tab-bordered text-xl ${i === tabIndex ? 'tab-active' : ''}`}>{v}</a>
                         )
                     })
                 }
@@ -415,9 +468,6 @@ const CanisterDetail: FC = () => {
                             <Form.Item
                                 label="Event Key"
                             >
-                                {/* <TreeSelect treeData={eventKeys} treeCheckable
-                                showCheckedStrategy="SHOW_PARENT"
-                                placeholder="Please select" /> */}
                                 <Select
                                     mode="multiple"
                                     allowClear
@@ -438,7 +488,6 @@ const CanisterDetail: FC = () => {
                                         <Form.Item
 
                                             name="caller"
-                                        // rules={[{ required: true, message: 'Please input your username!' }]}
                                         >
                                             <Input onChange={inputChange} />
                                         </Form.Item>
@@ -447,7 +496,6 @@ const CanisterDetail: FC = () => {
                                         <Form.Item
                                             label="Time"
                                             name="time"
-                                        // rules={[{ required: true, message: 'Please input your username!' }]}
                                         >
                                             <Space direction="vertical" size={14}>
                                                 <RangePicker disabledDate={disabledDate} />
@@ -465,17 +513,16 @@ const CanisterDetail: FC = () => {
                     </div>
                     <div className="card w-full bg-base-100 mt-10 glass">
                         <div className="card-body">
-                            <h2 className="card-title">Events</h2>
                             <Table
                                 columns={columns}
                                 // rowSelection={{}}
-                                expandable={{
-                                    // expandRowByClick: true,
-                                    showExpandColumn: false,
-                                    rowExpandable: (record: LogType) => ['Transfer', 'Sale', 'Mint'].includes(record.type),
-                                    expandedRowRender: (record: LogType ) => <p style={{ margin: 0 }}>{record.event_value}</p>,
-                                    // expandedRowKeys: ['event_key']
-                                }}
+                                // expandable={{
+                                //     // expandRowByClick: true,
+                                //     showExpandColumn: false,
+                                //     rowExpandable: (record: LogType) => ['Transfer', 'Sale', 'Mint'].includes(record.type),
+                                //     expandedRowRender: (record: LogType ) => <p style={{ margin: 0 }}>{record.event_value}</p>,
+                                //     // expandedRowKeys: ['event_key']
+                                // }}
                                 pagination={{
                                     current: currentPage,
                                     total,
@@ -499,7 +546,7 @@ const CanisterDetail: FC = () => {
             ) : <div className="h-full">
                 <div className="card w-full bg-base-100 pt-10 glass">
                     <div className="flex justify-between">
-                        <h2 className="card-title mb-0 text-gray-600 pl-10 text-2xl">Events</h2>
+                        <h2 className="card-title mb-0 text-gray-600 pl-10 text-xl">Events</h2>
                         <div className="pr-12 space-x-2">
                             <button className="btn btn-primary btn-sm btn-outline">24H</button>
                             <button className="btn btn-primary btn-sm">7D</button>
@@ -531,7 +578,7 @@ const CanisterDetail: FC = () => {
                 </div>
                 <div className="card w-full bg-base-100 mt-10 pt-10 glass">
                     <div className="flex justify-between">
-                        <h2 className="card-title mb-0 text-gray-600 pl-10 text-2xl">Callers</h2>
+                        <h2 className="card-title mb-0 text-gray-600 pl-10 text-xl">Callers</h2>
                         <div className="pr-12 space-x-2">
                             <button className="btn btn-primary btn-sm btn-outline">24H</button>
                             <button className="btn btn-primary btn-sm">7D</button>

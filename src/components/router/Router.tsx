@@ -56,7 +56,7 @@ const Layout: FC = () => {
                             </a>
                         </div>
                         <p className="mt-4">a storage and analysis service for canister`s event logs on Dfinity</p>
-                        <p className="text-lg mt-12">© 2022  ICES.ONE</p>
+                        <p className="text-md mt-12">© 2022  ICES.ONE</p>
                     </div>
                     <div className="h-full flex justify-between space-x-32 text-md text-gray-400 pt-7">
                         <dl className="flex flex-col space-y-3 justify-start">
