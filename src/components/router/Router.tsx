@@ -18,12 +18,12 @@ const Layout: FC = () => {
     return (
         <div className="flex flex-col justify-between bg-white min-h-screen box-border">
             <div className="navbar bg-gray-100 text-primary-content h-20">
-                <div className="container mx-auto flex justify-between">
+                <div className="container mx-auto flex justify-between 2xl:px-40 xl:px-10">
                     <div className="navbar flex items-center flex-1">
                         <a href="/" className=" normal-case text-xl w-32 h-12 ">
                             <img src={logo} alt="" />
                         </a>
-                        <ul className="flex space-x-5 leading-10 pl-14 my-auto items-center w-full h-full flex-1 text-xl font-bold">
+                        <ul className="flex space-x-5 leading-10 pl-14 my-auto items-center w-full h-full flex-1 text-md font-bold">
                             <li><Link className={pathname === '/' ? 'text-blue-400' : 'text-gray-500'} to="/">Home</Link></li>
                             <li><Link className={pathname === '/analytics' ? 'text-blue-400' : 'text-gray-500'} to="/analytics">Analytics</Link></li>
                         </ul>
@@ -44,11 +44,11 @@ const Layout: FC = () => {
                     </div>
                 </div>
             </div>
-            <div className="container mx-auto flex-1">
+            <div className="container mx-auto flex-1 2xl:px-40 xl:px-10">
                 <Outlet />
             </div>
             <footer className="h-56 px-0.5 bg-gray-100 mt-20">
-                <div className="h-56 container flex justify-between mx-auto">
+                <div className="h-56 container flex justify-between mx-auto 2xl:px-40 xl:px-10">
                     <div className="flex flex-col h-full">
                         <div className="w-32 h-12 mt-7">
                             <a href="/" className=" normal-case text-xl w-32 h-12">

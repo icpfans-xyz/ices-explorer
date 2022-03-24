@@ -6,15 +6,16 @@ import { Table } from 'antd'
 import { Link } from 'react-router-dom'
 import { graphQLClient } from '~/config'
 import { LogType, EventCountType } from './type'
+import { shortAccount } from '~/lib/util'
 const columns = [
-    { title: 'Block', dataIndex: 'block', key: 'block' },
-    { title: 'EVENT_TYPE', dataIndex: 'event_key', key: 'event_key' },
+    { title: 'BLOCK', dataIndex: 'block', key: 'block' },
+    { width: 120, title: 'CANISTER ID', dataIndex: 'canister_id', key: 'canister_id', render: (text: string) => <Link to={`/canister/${text}`}>{shortAccount(text)}</Link> },
+    { title: 'EVENT KEY', dataIndex: 'event_key', key: 'event_key' },
     // { title: 'TYPE', dataIndex: 'type', key: 'type' },
     Table.EXPAND_COLUMN,
-    { title: 'EVENT_VALUE', dataIndex: 'event_value', key: 'event_value' },
-    { title: 'Caller', dataIndex: 'caller', key: 'caller'},
-    { title: 'CANISTER_ID', dataIndex: 'canister_id', key: 'canister_id', render: (text: string) => <Link to={`/canister/${text}`}>{text}</Link> },
-    { title: 'CREATE_TIME', dataIndex: 'ices_time', key: 'ices_time' }
+    { title: 'EVENT VALUE', dataIndex: 'event_value', key: 'event_value' },
+    { width: 120, title: 'CALLER', dataIndex: 'caller', key: 'caller', render: (text: string) => <Link to={`/canister/${text}`}>{shortAccount(text)}</Link> },
+    { title: 'CREATE TIME', dataIndex: 'ices_time', key: 'ices_time' }
 ]
 const Index = () => {
     const [logs, setLogs] = useState<LogType[]>([])
@@ -181,8 +182,8 @@ const Index = () => {
             <div className="flex justify-between space-x-10 w-full mt-20 h-52">
                 <div className="card w-full h-full bg-base-100 shadow-xl">
                     <div className="card-body pb-0 pt-5">
-                        <h2 className="card-title mb-0 text-gray-400">Events</h2>
-                        <h1 className="text-4xl font-bold my-0">{eventCountAll.toLocaleString('en-US')}</h1>
+                        <div className=" mb-0 text-gray-400 text-md">Events</div>
+                        <h1 className="text-3xl font-bold my-0">{eventCountAll.toLocaleString('en-US')}</h1>
                         {eventCount7d.length > 0 && <p className="text-lg my-0 text-lime-500 flex justify-between"><span className="inline-block font-bold text-xl">+{eventCount7d[eventCount7d.length - 1].counts}</span> <i className="text-gray-300">24h</i></p>}
                         <ResponsiveContainer width="100%" height={50}>
                             <AreaChart
@@ -206,8 +207,8 @@ const Index = () => {
                 </div>
                 <div className="card w-full h-full bg-base-100 shadow-xl">
                     <div className="card-body pb-0 pt-5">
-                        <h2 className="card-title mb-0 text-gray-400">Integrated Canisters</h2>
-                        <h1 className="text-4xl font-bold my-0">{canisterCountAll.toLocaleString('en-US')}</h1>
+                        <div className=" mb-0 text-gray-400 text-md">Integrated Canisters</div>
+                        <h1 className="text-3xl font-bold my-0">{canisterCountAll.toLocaleString('en-US')}</h1>
                         {canisterCount7d.length > 0 && <p className="text-lg my-0 text-lime-500 flex justify-between"><span className="inline-block font-bold text-xl">+{canisterCount7d[canisterCount7d.length - 1].counts}</span> <i className="text-gray-300">24h</i></p>}
                         <ResponsiveContainer width="100%" height={50}>
                             <AreaChart
@@ -229,8 +230,8 @@ const Index = () => {
                 </div>
                 <div className="card w-full h-full bg-base-100 shadow-xl">
                     <div className="card-body pb-0 pt-5">
-                        <h2 className="card-title mb-0 text-gray-400">Caller</h2>
-                        <h1 className="text-4xl font-bold my-0">{callerCountAll.toLocaleString('en-US')}</h1>
+                        <div className=" mb-0 text-gray-400 text-md">Caller</div>
+                        <h1 className="text-3xl font-bold my-0">{callerCountAll.toLocaleString('en-US')}</h1>
                         {callerCount7d.length > 0 && <p className="text-lg my-0 text-lime-500 flex justify-between"><span className="inline-block font-bold text-xl">+{callerCount7d[callerCount7d.length - 1].counts}</span> <i className="text-gray-300">24h</i></p>}
                         <ResponsiveContainer width="100%" height={50}>
                             <AreaChart

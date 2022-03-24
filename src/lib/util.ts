@@ -13,3 +13,9 @@ export function debounce<T>(fun: Func<T> , delay: number) : (p: T) => void {
         }, delay)
     }
 }
+export const shortAccount = (accountId: string) : string => `${accountId.slice(0, 4)}...${accountId.slice(-4)}`
+
+export const shortPrincipal = (principal: string) : string => {
+    // const parts = (typeof principal === 'string' ? principal : principal.toText()).split('-')
+    return `${principal[0]}...${principal.slice(-1)[0]}`
+}
