@@ -42,3 +42,20 @@ export type EventCountType = {
     time: string
     counts: number
 }
+
+type OR = {
+    event_key: {
+        _eq: string;
+    };
+}
+export type WhereType = {
+    _and?: {
+        caller: {
+            _eq: string;
+        }
+    };
+    _or?: OR[];
+    canister_id?: {
+        _eq: string | undefined;
+    };
+}

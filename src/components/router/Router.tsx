@@ -1,5 +1,5 @@
 // import { Dialog } from '@headlessui/react';
-import { FC, lazy, Suspense, useRef, MutableRefObject, RefObject } from 'react'
+import { FC, lazy, Suspense, useRef } from 'react'
 import { Outlet, RouteObject, useRoutes, BrowserRouter, Link, useLocation, useNavigate } from 'react-router-dom'
 import logo from '../../logo_title.png'
 import iclogo from '~/assets/images/dfinity.svg'
@@ -77,22 +77,22 @@ const Layout: FC = () => {
                     <div className="h-full flex justify-between space-x-32 text-md text-gray-400 pt-7">
                         <dl className="flex flex-col space-y-3 justify-start">
                             <dt className="text-gray-500 text-lg">Sitemap</dt>
-                            <dd>Home</dd>
-                            <dd>Events</dd>
-                            <dd>Canister</dd>
-                            <dd>Analytics</dd>
+                            <dd><Link className="text-gray-400 hover:text-blue-400" to="/">Home</Link></dd>
+                            {/* <dd>Events</dd>
+                            <dd>Canister</dd> */}
+                            <dd><Link className="text-gray-400 hover:text-blue-400" to="/analytics">Analytics</Link></dd>
                         </dl>
                         <dl className="flex flex-col space-y-3 justify-start">
                             <dt className="text-gray-500 text-lg">Resouces</dt>
-                            <dd>Website</dd>
-                            <dd>Docs</dd>
-                            <dd>Github</dd>
+                            <dd><a className="text-gray-400 hover:text-blue-400" target="_blank" href="https://www.ices.one/" rel="noreferrer">Website</a></dd>
+                            <dd><a className="text-gray-400 hover:text-blue-400" target="_blank" href="https://www.doc.ices.one/" rel="noreferrer">Docs</a></dd>
+                            <dd><a className="text-gray-400 hover:text-blue-400" target="_blank" href="https://github.com/icpfans-xyz/ICES" rel="noreferrer">Github</a></dd>
                         </dl>
                         <dl className="flex flex-col space-y-3 justify-start">
                             <dt className="text-gray-500 text-lg">Socials</dt>
-                            <dd>Twitter</dd>
-                            <dd>Discord</dd>
-                            <dd>Telegram</dd>
+                            <dd><a className="text-gray-400 hover:text-blue-400" target="_blank" href="https://twitter.com/icesHQ" rel="noreferrer">Twitter</a></dd>
+                            <dd><a className="text-gray-400 hover:text-blue-400" target="_blank" href="https://discord.com/invite/b2SGPDHh" rel="noreferrer" />Discord</dd>
+                            <dd><a className="text-gray-400 hover:text-blue-400" target="_blank" href="https://t.me/icesone" rel="noreferrer">Telegram</a></dd>
                         </dl>
                     </div>
                 </div>

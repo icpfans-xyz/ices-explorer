@@ -1,12 +1,20 @@
 import { Head } from '~/components/shared/Head'
-import { useEffect, useState, useRef, RefObject } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { gql } from 'graphql-request'
 import { Area, AreaChart, ResponsiveContainer, Tooltip } from 'recharts'
 import { Table, Tag } from 'antd'
 import { Link, useNavigate } from 'react-router-dom'
 import { graphQLClient } from '~/config'
 import { LogType, EventCountType, EventValue } from './type'
-import { shortAccount, timeSince } from '~/lib/util'
+import { shortAccount } from '~/lib/util'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
+dayjs.extend(utc)
+dayjs.extend(timezone)
+dayjs.extend(relativeTime)
+// console.log(dayjs(dayjs().subtract(12, 'hour').format('YYYY-MM-DD HH:mm:ss')).fromNow())
 const columns = [
     { title: 'INDEX', dataIndex: 'block', key: 'block' },
     {
@@ -54,7 +62,11 @@ const columns = [
     },
     { title: 'TIME', dataIndex: 'ices_time', key: 'ices_time',
         render: (text: string) => {
-            return <span>{timeSince(text)}</span>
+            const d1 = dayjs(text)
+            const d2 = dayjs()
+            // console.log(dayjs.tz.guess())
+            // return <span>{dayjs.tz(text, dayjs.tz.guess()).format('YYYY-MM-DD HH:mm:ss')}</span>
+            return <span>{d2.diff(d1, 'hour')  > 12 ? d1.format('YYYY-MM-DD HH:mm:ss') : dayjs(dayjs().subtract(d2.diff(d1, 'hour'), 'hour')).fromNow()}</span>
         }
     }
 ]

@@ -24,14 +24,17 @@ export function timeSince(str: string, addBreak: boolean = false): string | unde
     const timeStamp = (new Date(str)).getTime()
     const now = new Date()
     const secondsPast = Math.round((now.getTime() - timeStamp) / 1000)
+    console.log(secondsPast)
     if (secondsPast < 60) {
         return `${secondsPast} secs ago`
     }
     if (secondsPast <= 300) {
         return `${Math.round((secondsPast * 1) / 60)} min ago`
     }
-
-    if (secondsPast > 300) {
+    if (secondsPast <= 3600) {
+        return `${Math.round((secondsPast * 1) / 3600)} hour ago`
+    }
+    if (secondsPast > 3600) {
         return dateTimeFmt(str)
     }
 }
