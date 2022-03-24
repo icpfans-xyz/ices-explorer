@@ -58,4 +58,7 @@ export type WhereType = {
     canister_id?: {
         _eq: string | undefined;
     };
+    caller?: {
+        _eq: string | undefined;
+    };
 }

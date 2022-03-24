@@ -1,4 +1,4 @@
-import { useEffect, useState, FC, SyntheticEvent, ChangeEvent, useRef, RefObject } from 'react'
+import { useEffect, useState, FC, SyntheticEvent, ChangeEvent, useRef } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { gql } from 'graphql-request'
 import {
@@ -86,11 +86,7 @@ const columns = [
         title: 'CALLER',
         dataIndex: 'caller',
         key: 'caller',
-        render: (text: string) => (
-            <a target="_blank" rel="noreferrer" href={`https://ic.rocks/principal/${text}`}>
-                {shortAccount(text)}
-            </a>
-        )
+        render: (text: string) => <Link to={`/caller/${text}`}>{shortAccount(text)}</Link>
     },
     { title: 'TIME', dataIndex: 'ices_time', key: 'ices_time',
         render: (text: string) => {
@@ -119,7 +115,7 @@ const CanisterDetail: FC = () => {
     const [orParams, setOrParams] = useState('')
     const [tabIndex, setTabIndex] = useState(0)
     const [callerInput, setCallerInput] = useState('')
-    const inputCaller = useRef<Input>(null)
+    // const inputCaller = useRef<Input>(null)
 
     function changeSize(current: number, size: number) {
         setOffset(size)
@@ -301,20 +297,8 @@ const CanisterDetail: FC = () => {
     // const [andParams, setAndParams] = useState('')
     function inputChange(e: ChangeEvent<HTMLInputElement>) {
         setCallerInput(e.currentTarget.value)
-        // if (e.target.value !== '') {
-        //     setAndParams(`,_and: {caller: {_eq: ${e.target.value}}}`)
-        // } else {
-        //     setAndParams('')
-        // }
     }
     function handleChange(arr: string[]) {
-        // const keys: EventKey[] = arr.map(v => {
-        //     return {
-        //         event_key: {
-        //             _eq: v
-        //         }
-        //     }
-        // })
         setQueryEventKeys(arr)
     }
     useEffect(() => {
@@ -345,19 +329,16 @@ const CanisterDetail: FC = () => {
     //     setPage(page)
     //     getEventLogAll()
     // }
-    function queryEventLogs() {
-        // let str = ''
-        if (queryEventKeys.length < 1) {
-            // str = ''
-            setOrParams('')
-        } else {
-            // queryEventKeys.forEach(v => {
-            //     str += JSON.stringify(v)
-            // })
-            setOrParams(`,_or:${JSON.stringify(queryEventKeys)}`.replace(/"/g, ''))
-        }
-        setPage(1)
-    }
+    // function queryEventLogs() {
+    //     // let str = ''
+    //     if (queryEventKeys.length < 1) {
+    //         // str = ''
+    //         setOrParams('')
+    //     } else {
+    //         setOrParams(`,_or:${JSON.stringify(queryEventKeys)}`.replace(/"/g, ''))
+    //     }
+    //     setPage(1)
+    // }
 
     // function copy(str: string) {
     //     const input: Element = document.createElement('input')
@@ -567,7 +548,7 @@ const CanisterDetail: FC = () => {
 
                                             name="caller"
                                         >
-                                            <Input ref={inputCaller} onChange={inputChange} />
+                                            <Input onChange={inputChange} />
                                         </Form.Item>
                                     </Col>
                                     <Col span={12} className="pl-5">
@@ -582,7 +563,7 @@ const CanisterDetail: FC = () => {
                                     </Col>
                                 </Row>
                                 <Row>
-                                    <Button type="primary" htmlType="submit" onClick={queryEventLogs}>
+                                    <Button type="primary" htmlType="submit" onClick={() => getEventLogAll() }>
                                         Search
                                     </Button>
                                 </Row>
