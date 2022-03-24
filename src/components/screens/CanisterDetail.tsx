@@ -14,6 +14,7 @@ import { Head } from '~/components/shared/Head'
 import icrock from '~/assets/images/ic-rocks.png'
 import icp123 from '~/assets/images/icp123.png'
 import { LogType, EventKey, CanisterEventKey, EventKeys } from './type'
+import { shortAccount } from '~/lib/util'
 // import { debounce } from '~/lib/util'
 const { Option } = Select
 // interface EventKey {
@@ -23,14 +24,13 @@ const { Option } = Select
 
 const { RangePicker } = DatePicker
 const columns = [
-    { title: 'Block', dataIndex: 'block', key: 'block' },
-
+    { title: 'BLOCK', dataIndex: 'block', key: 'block' },
+    { width: 120, title: 'CANISTER ID', dataIndex: 'canister_id', key: 'canister_id', render: (text: string) => <Link to={`/canister/${text}`}>{shortAccount(text)}</Link> },
     { title: 'EVENT KEY', dataIndex: 'event_key', key: 'event_key' },
     // { title: 'TYPE', dataIndex: 'type', key: 'type' },
     Table.EXPAND_COLUMN,
     { title: 'EVENT VALUE', dataIndex: 'event_value', key: 'event_value' },
-    { title: 'CALLER', dataIndex: 'caller', key: 'caller' },
-    { title: 'CANISTER ID', dataIndex: 'canister_id', key: 'canister_id', render: (text: string) => <Link to={`/canister/${text}`}>{text}12313</Link> },
+    { width: 120, title: 'CALLER', dataIndex: 'caller', key: 'caller', render: (text: string) => <Link to={`/canister/${text}`}>{shortAccount(text)}</Link> },
     { title: 'CREATE TIME', dataIndex: 'ices_time', key: 'ices_time' }
 ]
 
@@ -269,7 +269,7 @@ const CanisterDetail: FC = () => {
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                                 </svg>
                             </button>
-                            <div className="text-2xl text-gray-500">{canisterId}</div>
+                            <div className="text-xl text-gray-500">{canisterId}</div>
                             <button><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-300 hover:text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
                             </svg></button>

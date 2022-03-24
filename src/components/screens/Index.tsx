@@ -6,9 +6,16 @@ import { Table, Tag } from 'antd'
 import { Link } from 'react-router-dom'
 import { graphQLClient } from '~/config'
 import { LogType, EventCountType, EventValue } from './type'
+import { shortAccount } from '~/lib/util'
 
 const columns = [
     { title: 'INDEX', dataIndex: 'block', key: 'block' },
+    {
+        title: 'CANISTER ID',
+        dataIndex: 'canister_id',
+        key: 'canister_id',
+        render: (text: string) => <Link to={`/canister/${text}`}>{shortAccount(text)}</Link>
+    },
     { title: 'EVENT KEY', dataIndex: 'event_key', key: 'event_key' },
     // { title: 'TYPE', dataIndex: 'type', key: 'type' },
     // Table.EXPAND_COLUMN,
@@ -26,7 +33,17 @@ const columns = [
                     return (
                         <div key={index}>
                             <Tag key={item.sub_key}>{item.sub_key}</Tag>
-                            {item.sub_value}
+
+                            {item.sub_key === 'from' || item.sub_key === 'to' ? (
+                                <a
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    href={`https://ic.rocks/principal/${item.sub_value}`}>
+                                    {shortAccount(item.sub_value)}
+                                </a>
+                            ) : (
+                                item.sub_value
+                            )}
                         </div>
                     )
                 })
@@ -35,12 +52,15 @@ const columns = [
             }
         }
     },
-    { title: 'CALLER', dataIndex: 'caller', key: 'caller' },
     {
-        title: 'CANISTER ID',
-        dataIndex: 'canister_id',
-        key: 'canister_id',
-        render: (text: string) => <Link to={`/canister/${text}`}>{text}</Link>
+        title: 'CALLER',
+        dataIndex: 'caller',
+        key: 'caller',
+        render: (text: string) => (
+            <a target="_blank" rel="noreferrer" href={`https://ic.rocks/principal/${text}`}>
+                {shortAccount(text)}
+            </a>
+        )
     },
     { title: 'TIME', dataIndex: 'ices_time', key: 'ices_time' }
 ]
@@ -234,8 +254,8 @@ const Index = () => {
             <div className="flex justify-between w-full mt-20 space-x-10 h-52">
                 <div className="w-full h-full shadow-xl card bg-base-100">
                     <div className="pt-5 pb-0 card-body">
-                        <h2 className="mb-0 text-gray-400 card-title">Events</h2>
-                        <h1 className="my-0 text-4xl font-bold">
+                        <div className="mb-0 text-gray-400 text-md">Events</div>
+                        <h1 className="my-0 text-3xl font-bold">
                             {eventCountAll.toLocaleString('en-US')}
                         </h1>
                         {eventCount7d.length > 0 && (
@@ -277,8 +297,8 @@ const Index = () => {
                 </div>
                 <div className="w-full h-full shadow-xl card bg-base-100">
                     <div className="pt-5 pb-0 card-body">
-                        <h2 className="mb-0 text-gray-400 card-title">Integrated Canisters</h2>
-                        <h1 className="my-0 text-4xl font-bold">
+                        <div className="mb-0 text-gray-400 text-md">Integrated Canisters</div>
+                        <h1 className="my-0 text-3xl font-bold">
                             {canisterCountAll.toLocaleString('en-US')}
                         </h1>
                         {canisterCount7d.length > 0 && (
@@ -320,8 +340,8 @@ const Index = () => {
                 </div>
                 <div className="w-full h-full shadow-xl card bg-base-100">
                     <div className="pt-5 pb-0 card-body">
-                        <h2 className="mb-0 text-gray-400 card-title">Caller</h2>
-                        <h1 className="my-0 text-4xl font-bold">
+                        <div className="mb-0 text-gray-400 text-md">Caller</div>
+                        <h1 className="my-0 text-3xl font-bold">
                             {callerCountAll.toLocaleString('en-US')}
                         </h1>
                         {callerCount7d.length > 0 && (
@@ -368,16 +388,15 @@ const Index = () => {
                     <Table
                         columns={columns}
                         // rowSelection={{}}
-                        expandable={{
-                            expandRowByClick: true,
-                            showExpandColumn: false,
-                            rowExpandable: (record) =>
-                                ['Transfer', 'Sale', 'Mint'].includes(record.type),
-                            expandedRowRender: (record) => (
-                                <p style={{ margin: 0 }}>{record.event_value}</p>
-                            )
-                            // expandedRowKeys: ['event_key']
-                        }}
+                        // expandable={{
+                        //     expandRowByClick: true,
+                        //     showExpandColumn: false,
+                        //     rowExpandable: (record) =>
+                        //         ['Transfer', 'Sale', 'Mint'].includes(record.type),
+                        //     expandedRowRender: (record) => (
+                        //         <p style={{ margin: 0 }}>{record.event_value}</p>
+                        //     )
+                        // }}
                         pagination={{
                             current: currentPage,
                             total: total,
