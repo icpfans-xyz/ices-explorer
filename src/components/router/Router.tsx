@@ -1,6 +1,6 @@
 // import { Dialog } from '@headlessui/react';
-import { FC, lazy, Suspense } from 'react'
-import { Outlet, RouteObject, useRoutes, BrowserRouter, Link, useLocation } from 'react-router-dom'
+import { FC, lazy, Suspense, useRef, MutableRefObject, RefObject } from 'react'
+import { Outlet, RouteObject, useRoutes, BrowserRouter, Link, useLocation, useNavigate } from 'react-router-dom'
 import logo from '../../logo_title.png'
 import iclogo from '~/assets/images/dfinity.svg'
 const Loading = () => <p className="p-4 w-full h-full text-center"><button className="btn loading">loading</button></p>
@@ -11,10 +11,26 @@ const PorjectDetialScreen = lazy(() => import('~/components/screens/PorjectDetai
 const CanisterDetialScreen = lazy(() => import('~/components/screens/CanisterDetail'))
 const CallerDetailScreen = lazy(() => import('~/components/screens/CallerDetail'))
 const AnalyticsScreen = lazy(() => import('~/components/screens/Analytics'))
+const SearchScreen = lazy(() => import('~/components/screens/Search'))
 
 const Layout: FC = () => {
     const { pathname } = useLocation()
-    
+    const search = useRef<HTMLInputElement | null>(null)
+    const navigate = useNavigate()
+    function handleSearch() {
+        if (search.current) {
+            const str = search.current.value.trim()
+            if (str.length === 27) {
+                navigate(`/canister/${str}`)
+                return false
+            }
+            if (str.length === 63) {
+                navigate(`/caller/${str}`)
+                return false
+            }
+            navigate('/search')
+        }
+    }
     return (
         <div className="flex flex-col justify-between bg-white min-h-screen box-border">
             <div className="navbar bg-gray-100 text-primary-content h-20">
@@ -31,8 +47,8 @@ const Layout: FC = () => {
                     <div className="w-auto flex space-x-16">
                         {pathname !== '/' && <div className="form-control w-auto">
                             <div className="input-group w-full">
-                                <input type="text" placeholder="Search by Canister Id, Principal Id" className="input input-bordered w-64" />
-                                <button className="btn btn-square  bg-gray-400 border-gray-400">
+                                <input ref={search} type="text" placeholder="Search by Canister Id, Principal Id" className="input input-bordered w-64 text-gray-600" />
+                                <button onClick={handleSearch} className="btn btn-square  bg-gray-400 border-gray-400">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                                 </button>
                             </div>
@@ -118,6 +134,11 @@ const InnerRouter: FC = () => {
                 {
                     path: '/caller/:callerId',
                     element: <CallerDetailScreen />
+                },
+
+                {
+                    path: '/search',
+                    element: <SearchScreen />
                 },
                 {
                     path: '*',

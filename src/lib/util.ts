@@ -54,3 +54,17 @@ export function dateTimeFmt(str: string) : string {
         hour12: false
     })}`
 }
+
+export function copy(str: string | undefined) {
+    if (str) {
+        const input: HTMLInputElement = document.createElement('input')
+        document.body.appendChild(input)
+        input.setAttribute('value', str)
+        input.select()
+        if (document.execCommand('copy')) {
+            document.execCommand('copy')
+            console.log('复制成功')
+        }
+        document.body.removeChild(input)
+    }
+}

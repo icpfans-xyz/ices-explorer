@@ -1,5 +1,5 @@
 import { Head } from '~/components/shared/Head'
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, RefObject } from 'react'
 import { gql } from 'graphql-request'
 import { Area, AreaChart, ResponsiveContainer, Tooltip } from 'recharts'
 import { Table, Tag } from 'antd'
@@ -50,11 +50,7 @@ const columns = [
         title: 'CALLER',
         dataIndex: 'caller',
         key: 'caller',
-        render: (text: string) => (
-            <a target="_blank" rel="noreferrer" href={`https://ic.rocks/principal/${text}`}>
-                {shortAccount(text)}
-            </a>
-        )
+        render: (text: string) => <Link to={`/caller/${text}`}>{shortAccount(text)}</Link>
     },
     { title: 'TIME', dataIndex: 'ices_time', key: 'ices_time',
         render: (text: string) => {
@@ -74,7 +70,7 @@ const Index = () => {
     const [currentPage, setPage] = useState(1)
     const [offset, setOffset] = useState(10)
     const [total, setTotal] = useState(0)
-    const search = useRef(null)
+    const search = useRef<HTMLInputElement | null>(null)
     const navigate = useNavigate()
     async function getEventCounts7d() {
         const query = gql`
@@ -158,7 +154,6 @@ const Index = () => {
     }
 
     function changeSize(current: number, size: number) {
-        console.log(current, size)
         setOffset(size)
     }
 
@@ -207,10 +202,15 @@ const Index = () => {
     }
 
     function handleSearch() {
-        const str = search.current.value.trim()
-        console.log()
-        if (str.length === 27) {
-            navigate(`/canister/${str}`)
+        if (search.current) {
+            const str = search.current.value.trim()
+            if (str.length === 27) {
+                navigate(`/canister/${str}`)
+            }
+            if (str.length === 63) {
+                navigate(`/caller/${str}`)
+            }
+            navigate('/search')
         }
     }
     useEffect(() => {
