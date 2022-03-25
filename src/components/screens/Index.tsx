@@ -62,10 +62,8 @@ const columns = [
     },
     { title: 'TIME', dataIndex: 'ices_time', key: 'ices_time',
         render: (text: string) => {
-            const d1 = dayjs(text)
+            const d1 = dayjs(text).utc(true)
             const d2 = dayjs()
-            // console.log(dayjs.tz.guess())
-            // return <span>{dayjs.tz(text, dayjs.tz.guess()).format('YYYY-MM-DD HH:mm:ss')}</span>
             return <span>{d2.diff(d1, 'hour')  > 12 ? d1.format('YYYY-MM-DD HH:mm:ss') : dayjs(dayjs().subtract(d2.diff(d1, 'hour'), 'hour')).fromNow()}</span>
         }
     }

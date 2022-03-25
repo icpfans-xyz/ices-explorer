@@ -75,7 +75,13 @@ const columns = [
         key: 'caller',
         render: (text: string) => <Link to={`/caller/${text}`}>{shortAccount(text)}</Link>
     },
-    { title: 'TIME', dataIndex: 'ices_time', key: 'ices_time' }
+    { title: 'TIME', dataIndex: 'ices_time', key: 'ices_time',
+        render: (text: string) => {
+            const d1 = dayjs(text).utc(true)
+            const d2 = dayjs()
+            return <span>{d2.diff(d1, 'hour')  > 12 ? d1.format('YYYY-MM-DD HH:mm:ss') : dayjs(dayjs().subtract(d2.diff(d1, 'hour'), 'hour')).fromNow()}</span>
+        }
+    }
 ]
 const CanisterDetail: FC = () => {
     const { callerId } = useParams()

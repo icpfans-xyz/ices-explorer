@@ -89,13 +89,13 @@ const Layout: FC = () => {
                         <dl className="flex flex-col space-y-3 justify-start">
                             <dt className="text-gray-500 text-lg">Resouces</dt>
                             <dd><a className="text-gray-400 hover:text-blue-400" target="_blank" href="https://www.ices.one/" rel="noreferrer">Website</a></dd>
-                            <dd><a className="text-gray-400 hover:text-blue-400" target="_blank" href="https://www.doc.ices.one/" rel="noreferrer">Docs</a></dd>
+                            <dd><a className="text-gray-400 hover:text-blue-400" target="_blank" href="https://doc.ices.one/" rel="noreferrer">Docs</a></dd>
                             <dd><a className="text-gray-400 hover:text-blue-400" target="_blank" href="https://github.com/icpfans-xyz/ICES" rel="noreferrer">Github</a></dd>
                         </dl>
                         <dl className="flex flex-col space-y-3 justify-start">
                             <dt className="text-gray-500 text-lg">Socials</dt>
                             <dd><a className="text-gray-400 hover:text-blue-400" target="_blank" href="https://twitter.com/icesHQ" rel="noreferrer">Twitter</a></dd>
-                            <dd><a className="text-gray-400 hover:text-blue-400" target="_blank" href="https://discord.com/invite/b2SGPDHh" rel="noreferrer" />Discord</dd>
+                            <dd><a className="text-gray-400 hover:text-blue-400" target="_blank" href="https://discord.gg/8k4WMhsheZ" rel="noreferrer" />Discord</dd>
                             <dd><a className="text-gray-400 hover:text-blue-400" target="_blank" href="https://t.me/icesone" rel="noreferrer">Telegram</a></dd>
                         </dl>
                     </div>
