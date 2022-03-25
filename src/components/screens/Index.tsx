@@ -218,9 +218,15 @@ const Index = () => {
             const str = search.current.value.trim()
             if (str.length === 27) {
                 navigate(`/canister/${str}`)
+                return false
             }
             if (str.length === 63) {
                 navigate(`/caller/${str}`)
+                return false
+            }
+            if (str.length === 9) {
+                navigate(`/caller/${str}`)
+                return false
             }
             navigate('/search')
         }

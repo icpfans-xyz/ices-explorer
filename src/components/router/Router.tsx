@@ -28,6 +28,10 @@ const Layout: FC = () => {
                 navigate(`/caller/${str}`)
                 return false
             }
+            if (str.length === 9) {
+                navigate(`/caller/${str}`)
+                return false
+            }
             navigate('/search')
         }
     }

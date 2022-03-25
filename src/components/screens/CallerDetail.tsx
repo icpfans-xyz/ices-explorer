@@ -1,19 +1,19 @@
-import { useEffect, useState, FC, SyntheticEvent, ChangeEvent } from 'react'
+import { useEffect, useState, FC, SyntheticEvent } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { gql } from 'graphql-request'
 import {
-    LineChart, ResponsiveContainer, Tooltip, XAxis, CartesianGrid,
+    LineChart, ResponsiveContainer, XAxis, CartesianGrid,
     YAxis,
     Legend,
     Line
 } from 'recharts'
 import moment from 'moment'
-import { Table, Select, Form, DatePicker, Space, Row, Col, Button, Tag } from 'antd'
+import { Table, Select, Form, DatePicker, Space, Row, Col, Button, Tag, Tooltip } from 'antd'
 import { graphQLClient } from '~/config'
 import { Head } from '~/components/shared/Head'
 import icrock from '~/assets/images/ic-rocks.png'
 // import icp123 from '~/assets/images/icp123.png'
-import { LogType, EventKey, CanisterEventKey, EventKeys, EventValue, WhereType } from './type'
+import { LogType, CanisterEventKey, EventKeys, EventValue, WhereType } from './type'
 import { shortAccount, copy } from '~/lib/util'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -73,12 +73,7 @@ const columns = [
         title: 'CALLER',
         dataIndex: 'caller',
         key: 'caller',
-        render: (text: string) => (
-            // <a target="_blank" rel="noreferrer" href={`https://ic.rocks/principal/${text}`}>
-            <span>{shortAccount(text)} </span>
-                
-            // </a>
-        )
+        render: (text: string) => <Link to={`/caller/${text}`}>{shortAccount(text)}</Link>
     },
     { title: 'TIME', dataIndex: 'ices_time', key: 'ices_time' }
 ]
@@ -94,9 +89,8 @@ const CanisterDetail: FC = () => {
     const [eventKeys, setEventKeys] = useState < EventKeys[] > ([])
     const [eventKeyPage, setEventKeyPage] = useState < number > (1)
     const [queryEventKeys, setQueryEventKeys] = useState < string[] > ([])
-    const [orParams, setOrParams] = useState('')
     const [tabIndex, setTabIndex] = useState(0)
-    const [callerInput, setCallerInput] = useState('')
+    // const [callerInput, setCallerInput] = useState('')
     function changeSize(current: number, size: number) {
         setOffset(size)
     }
@@ -173,18 +167,16 @@ const CanisterDetail: FC = () => {
         const res = await graphQLClient.request(query)
         setEventCount7d(res.v1_canister_event_count_7d)
     }
-    // async function getEventCount24H() {
-    //     const query = gql`
-    //     query MyQuery {
-    //         v1_canister_event_count_7d(where: {canister_id: {_eq: "${canisterId}"}, time: {_eq: "${dayjs().subtract(24, 'hour').format('YYYY-MM-DD')}"}}) {
-    //             canister_id
-    //             counts
-    //             time
-    //         }
-    //     }`
-    //     const res = await graphQLClient.request(query)
-    //     setEventCount24H(res.v1_canister_event_count_7d[0].counts)
-    // }
+    async function getEventCount24H() {
+        const query = gql`
+        query MyQuery {
+            v1_caller_event_count_7d(where: {time: {_eq: "${dayjs().subtract(24, 'hour').format('YYYY-MM-DD')}"}, caller: {_eq: "${callerId}"}}) {
+                counts
+            }
+        }`
+        const res = await graphQLClient.request(query)
+        setEventCount24H(res.v1_caller_event_count_7d[0].counts)
+    }
     async function getEventCountAll() {
         const query = gql`
         query MyQuery {
@@ -269,7 +261,7 @@ const CanisterDetail: FC = () => {
     useEffect(() => {
         getEventLogAll()
         // getSearchEventCountAll()
-    }, [currentPage, offset, orParams])
+    }, [currentPage, offset])
 
 
 
@@ -294,6 +286,7 @@ const CanisterDetail: FC = () => {
     // }
 
     useEffect(() => {
+        getEventCount24H()
         getEventCounts7d()
         getEventCountAll()
         getEventKeys()
@@ -319,9 +312,11 @@ const CanisterDetail: FC = () => {
                                 </svg>
                             </button>
                             <div className="text-xl text-gray-500">{callerId}</div>
-                            <button onClick={() => copy(callerId)}><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-300 hover:text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
-                            </svg></button>
+                            <Tooltip trigger="click" title="Copied!">
+                                <button onClick={() => copy(callerId)}><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-300 hover:text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+                                </svg></button>
+                            </Tooltip>
                             <button>
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -341,7 +336,7 @@ const CanisterDetail: FC = () => {
                             <div className="card-body p-0 w-40">
                                 <h2 className="card-title mb-0 text-gray-400">Total Events</h2>
                                 <h1 className="text-4xl font-bold my-0">{eventCountAll}</h1>
-                                <p className="text-lg my-0 text-lime-500 flex justify-between"><span className="inline-block font-bold text-xl">+75</span> <i className="text-gray-300">24h</i></p>
+                                <p className="text-lg my-0 text-lime-500 flex justify-between"><span className="inline-block font-bold text-xl">+{eventCount24H}</span> <i className="text-gray-300">24h</i></p>
                             </div>
                         </div>
                         {/* <div className="card bg-base-100 glass p-5">
@@ -451,10 +446,10 @@ const CanisterDetail: FC = () => {
                     <div className="flex justify-between">
                         <h2 className="card-title mb-0 text-gray-600 pl-10 text-xl">Events</h2>
                         <div className="pr-12 space-x-2">
-                            <button className="btn btn-primary btn-sm btn-outline">24H</button>
-                            <button className="btn btn-primary btn-sm">7D</button>
-                            <button className="btn btn-primary btn-sm btn-outline">30D</button>
-                            <button className="btn btn-primary btn-sm btn-outline">All</button>
+                            <button className="btn btn-sm btn-outline base-200">24H</button>
+                            <button className="btn btn-sm base-100">7D</button>
+                            <button className="btn btn-sm btn-outline">30D</button>
+                            <button className="btn btn-sm btn-outline">All</button>
                         </div>
                     </div>
                     <ResponsiveContainer width="100%" height={450}>
@@ -472,7 +467,7 @@ const CanisterDetail: FC = () => {
                             <CartesianGrid stroke="#ccc" strokeDasharray="3 3" />
                             <XAxis dataKey="time" />
                             <YAxis dataKey="counts" />
-                            <Tooltip />
+                            {/* <Tooltip /> */}
                             <Legend />
                             {/* <Area type="monotone" dataKey="amt" fill="#8884d8" stroke="#8884d8" /> */}
                             <Line type="monotone" dataKey="counts" stroke="#82ca9d" strokeWidth={2} />
