@@ -165,13 +165,13 @@ const CanisterDetail: FC = () => {
     async function getEventCounts7d() {
         const query = gql`
         query MyQuery {
-            v1_canister_event_count_7d(where: {canister_id: {_eq: "${callerId}"}}, order_by: {time: asc}) {
+            v1_caller_event_count_7d(where: {caller: {_eq: "${callerId}"}}) {
                 counts
                 time
             }
         }`
         const res = await graphQLClient.request(query)
-        setEventCount7d(res.v1_canister_event_count_7d)
+        setEventCount7d(res.v1_caller_event_count_7d)
     }
     async function getEventCount24H() {
         const query = gql`
