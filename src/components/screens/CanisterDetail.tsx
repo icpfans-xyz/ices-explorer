@@ -393,14 +393,14 @@ const CanisterDetail: FC = () => {
                             </button>
                         </div>
                         <div className="flex space-x-5 pt-5">
-                            <button className="flex btn btn-ghost bg-gray-200 space-x-2">
+                            <a href={`https://ic.rocks/principal/${canisterId}`} target="_bank" className="flex btn btn-ghost bg-gray-200 space-x-2">
                                 <img src={icrock} alt="" className="w-6 h-6" />
                                 <span>ic.rocks</span>
-                            </button>
-                            <button className="btn btn-ghost bg-gray-200 space-x-2">
+                            </a>
+                            <a href="https://icp123.xyz/ices" target="_bank" className="btn btn-ghost bg-gray-200 space-x-2">
                                 <img src={icp123} alt="" className="w-6 h-6" />
                                 <span>ICES</span>
-                            </button>
+                            </a>
                         </div>
                     </div>
 
