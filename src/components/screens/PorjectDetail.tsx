@@ -46,8 +46,8 @@ const PorjectDetail: FC = () => {
         const query = gql`
         query MyQuery {
             event_log_test(order_by: {time: desc}, limit: ${offset}, offset: ${
-            offset * currentPage
-        }, where: {project_id: {_eq: "${projectId}"}}) {
+    offset * currentPage
+}, where: {project_id: {_eq: "${projectId}"}}) {
                 id
                 caller
                 event_value
@@ -65,9 +65,7 @@ const PorjectDetail: FC = () => {
     async function getAllcountsByDay() {
         const query = gql`
         query MyQuery {
-            test_project_id_${day}d_count${
-            day === 90 ? 's' : ''
-        }(where: {project_id: {_eq: "${projectId}"}}) {
+            test_project_id_${day}d_count${ day === 90 ? 's' : '' }(where: {project_id: {_eq: "${projectId}"}}) {
                 counts
                 time
                 project_id

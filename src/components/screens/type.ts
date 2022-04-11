@@ -50,9 +50,12 @@ type OR = {
 }
 export type WhereType = {
     _and?: {
-        caller: {
+        caller?: {
             _eq: string;
-        }
+        };
+        canisterId?: {
+            _eq: string;
+        };
     };
     _or?: OR[];
     canister_id?: {

@@ -2,23 +2,25 @@ import { useEffect, useState, FC, SyntheticEvent, ChangeEvent } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { gql } from 'graphql-request'
 import {
-    LineChart, ResponsiveContainer, XAxis, CartesianGrid,
+    LineChart, ResponsiveContainer, XAxis, CartesianGrid, Tooltip,
     YAxis,
     Legend,
     Line
 } from 'recharts'
 import moment from 'moment'
-import { Table, Select, Form, Input, DatePicker, Space, Row, Col, Button, Tag, Tooltip } from 'antd'
+import antd, { Table, Select, Form, Input, DatePicker, Space, Row, Col, Button, Tag } from 'antd'
 import { graphQLClient } from '~/config'
 import { Head } from '~/components/shared/Head'
 import icrock from '~/assets/images/ic-rocks.png'
-import icp123 from '~/assets/images/icp123.png'
+// import icp123 from '~/assets/images/icp123.png'
 import { LogType, CanisterEventKey, EventKeys, EventValue, WhereType } from './type'
 import { shortAccount, copy } from '~/lib/util'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
+import CountChart from '~/components/charts/CountChart'
+
 dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(relativeTime)
@@ -30,16 +32,6 @@ const { Option } = Select
 // }
 
 const { RangePicker } = DatePicker
-// const columns = [
-//     { title: 'BLOCK', dataIndex: 'block', key: 'block' },
-//     { width: 120, title: 'CANISTER ID', dataIndex: 'canister_id', key: 'canister_id', render: (text: string) => <Link to={`/canister/${text}`}>{shortAccount(text)}</Link> },
-//     { title: 'EVENT KEY', dataIndex: 'event_key', key: 'event_key' },
-//     // { title: 'TYPE', dataIndex: 'type', key: 'type' },
-//     Table.EXPAND_COLUMN,
-//     { title: 'EVENT VALUE', dataIndex: 'event_value', key: 'event_value' },
-//     { width: 120, title: 'CALLER', dataIndex: 'caller', key: 'caller', render: (text: string) => <Link to={`/canister/${text}`}>{shortAccount(text)}</Link> },
-//     { title: 'CREATE TIME', dataIndex: 'ices_time', key: 'ices_time' }
-// ]
 const columns = [
     { title: 'INDEX', dataIndex: 'block', key: 'block' },
     {
@@ -216,7 +208,7 @@ const CanisterDetail: FC = () => {
             }
         }`
         const res = await graphQLClient.request(query)
-        setEventCount24H(res.v1_canister_event_count_7d[0].counts)
+        setEventCount24H(res.v1_canister_event_count_7d.length ? res.v1_canister_event_count_7d[0].counts : 0)
     }
     async function getCallerCount24H() {
         const query = gql`
@@ -228,7 +220,7 @@ const CanisterDetail: FC = () => {
             }
         }`
         const res = await graphQLClient.request(query)
-        setCallerCount24H(res.v1_canister_caller_count_7d[0].counts)
+        setCallerCount24H(res.v1_canister_caller_count_7d.length ? res.v1_canister_caller_count_7d[0].counts : 0)
     }
     // async function getSearchEventCountAll() {
     //     const query = gql`
@@ -324,34 +316,12 @@ const CanisterDetail: FC = () => {
             // }, 500)
         }
     }
-    // function changePage(page) {
-    //     setPage(page)
-    //     getEventLogAll()
-    // }
-    // function queryEventLogs() {
-    //     // let str = ''
-    //     if (queryEventKeys.length < 1) {
-    //         // str = ''
-    //         setOrParams('')
-    //     } else {
-    //         setOrParams(`,_or:${JSON.stringify(queryEventKeys)}`.replace(/"/g, ''))
-    //     }
-    //     setPage(1)
-    // }
-
-    // function copy(str: string) {
-    //     const input: Element = document.createElement('input')
-    //     document.body.appendChild(input)
-    //     input.setAttribute('value', canisterId)
-    //     input.select()
-    //     if (document.execCommand('copy')) {
-    //         document.execCommand('copy')
-    //         console.log('复制成功')
-    //     }
-    //     document.body.removeChild(input)
-    // }
+    const chartsWhere: WhereType = {
+        canister_id: {
+            _eq: canisterId
+        }
+    } 
     useEffect(() => {
-        // getLogTotal()
         getEventCounts7d()
         getEventCountAll()
         getCallerCounts7d()
@@ -381,11 +351,11 @@ const CanisterDetail: FC = () => {
                                 </svg>
                             </button>
                             <div className="text-xl text-gray-500">{canisterId}</div>
-                            <Tooltip trigger="click" title="Copied!">
+                            <antd.Tooltip trigger="click" title="Copied!">
                                 <button onClick={() => copy(canisterId)}><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-300 hover:text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
                                 </svg></button>
-                            </Tooltip>
+                            </antd.Tooltip>
                             <button>
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -397,10 +367,10 @@ const CanisterDetail: FC = () => {
                                 <img src={icrock} alt="" className="w-6 h-6" />
                                 <span>ic.rocks</span>
                             </a>
-                            <a href="https://icp123.xyz/ices" target="_bank" className="btn btn-ghost bg-gray-200 space-x-2">
+                            {/* <a href="https://icp123.xyz/ices" target="_bank" className="btn btn-ghost bg-gray-200 space-x-2">
                                 <img src={icp123} alt="" className="w-6 h-6" />
                                 <span>ICES</span>
-                            </a>
+                            </a> */}
                         </div>
                     </div>
 
@@ -455,54 +425,6 @@ const CanisterDetail: FC = () => {
                 </div>
 
             </div>
-            {/* <h1 className="text-4xl font-bold mt-8">CanisterId: <span className="inline-block pl-5"> {canisterId}</span></h1>
-            <div className="flex justify-start space-x-10 w-full mt-20 h-52">
-                <div className="card h-full bg-base-100 shadow-xl w-1/3">
-                    <div className="card-body pb-0 pt-5">
-                        <h2 className="card-title mb-0 text-gray-400">Events</h2>
-                        <h1 className="text-4xl font-bold my-0">{eventCountAll}</h1>
-                        {eventCount7d.length > 0 && <p className="text-lg my-0 text-lime-500">+<span className="inline-block font-bold text-xl">{eventCount7d[eventCount7d.length - 1].counts}</span> <i className="text-gray-300">24h</i></p>}
-                        <ResponsiveContainer width="100%" height={50}>
-                            <AreaChart
-                                height={100}
-                                data={eventCount7d}
-                                margin={{
-                                    top: 0,
-                                    right: 0,
-                                    left: 0,
-                                    bottom: 0,
-                                }}
-                            >
-                                <Tooltip />
-                                <Area type="monotone" dataKey="counts" stroke="#82ca9d" fill="#edfff4ed" />
-                            </AreaChart>
-                        </ResponsiveContainer>
-                        {eventCount7d.length > 0 && <p className="flex justify-between"><span>{eventCount7d[0].time}</span><span>{eventCount7d[eventCount7d.length - 1].time}</span></p>}
-                    </div>
-                </div>
-                <div className="card w-1/3 h-full bg-base-100 shadow-xl">
-                    <div className="card-body pb-0 pt-5">
-                        <h2 className="card-title mb-0 text-gray-400">Caller</h2>
-                        <h1 className="text-4xl font-bold my-0">{callerCountAll}</h1>
-                        {callerCount7d.length > 0 && <p className="text-lg my-0 text-lime-500">+<span className="inline-block font-bold text-xl">{callerCount7d[callerCount7d.length - 1].counts}</span> <i className="text-gray-300">24h</i></p>}
-                        <ResponsiveContainer width="100%" height={50}>
-                            <AreaChart
-                                height={100}
-                                data={callerCount7d}
-                                margin={{
-                                    top: 0,
-                                    right: 0,
-                                    left: 0,
-                                    bottom: 0
-                                }}>
-                                <Tooltip />
-                                <Area type="monotone" dataKey="counts" stroke="#f33968" fill="#f279ee" />
-                            </AreaChart>
-                        </ResponsiveContainer>
-                        {callerCount7d.length > 0 && <p className="flex justify-between"><span>{callerCount7d[0].time}</span><span>{callerCount7d[callerCount7d.length - 1].time}</span></p>}
-                    </div>
-                </div>
-            </div> */}
             <div className="tabs my-10">
                 {
                     ['Events', 'Analytics'].map((v, i) => {
@@ -604,70 +526,8 @@ const CanisterDetail: FC = () => {
                     </div>
                 </div>
             ) : <div className="h-full">
-                <div className="card w-full bg-base-100 pt-10 glass">
-                    <div className="flex justify-between">
-                        <h2 className="card-title mb-0 text-gray-600 pl-10 text-xl">Events</h2>
-                        <div className="pr-12 space-x-2">
-                            <button className="btn btn-sm btn-outline base-200">24H</button>
-                            <button className="btn btn-sm base-100">7D</button>
-                            <button className="btn btn-sm btn-outline">30D</button>
-                            <button className="btn btn-sm btn-outline">All</button>
-                        </div>
-                    </div>
-                    <ResponsiveContainer width="100%" height={450}>
-                        <LineChart
-                            width={500}
-                            height={400}
-                            data={eventCount7d}
-                            margin={{
-                                top: 20,
-                                right: 50,
-                                bottom: 20,
-                                left: 5,
-                            }}
-                        >
-                            <CartesianGrid stroke="#ccc" strokeDasharray="3 3" />
-                            <XAxis dataKey="time" />
-                            <YAxis dataKey="counts" />
-                            {/* <Tooltip /> */}
-                            <Legend />
-                            {/* <Area type="monotone" dataKey="amt" fill="#8884d8" stroke="#8884d8" /> */}
-                            <Line type="monotone" dataKey="counts" stroke="#82ca9d"  strokeWidth={2} />
-                        </LineChart>
-                    </ResponsiveContainer>
-                </div>
-                <div className="card w-full bg-base-100 mt-10 pt-10 glass">
-                    <div className="flex justify-between">
-                        <h2 className="card-title mb-0 text-gray-600 pl-10 text-xl">Callers</h2>
-                        <div className="pr-12 space-x-2">
-                            <button className="btn btn-sm btn-outline base-200">24H</button>
-                            <button className="btn btn-sm base-100">7D</button>
-                            <button className="btn btn-sm btn-outline">30D</button>
-                            <button className="btn btn-sm btn-outline">All</button>
-                        </div>
-                    </div>
-                    <ResponsiveContainer width="100%" height={450}>
-                        <LineChart
-                            width={500}
-                            height={400}
-                            data={callerCount7d}
-                            margin={{
-                                top: 20,
-                                right: 50,
-                                bottom: 20,
-                                left: 5,
-                            }}
-                        >
-                            <CartesianGrid stroke="#ccc" strokeDasharray="3 3" />
-                            <XAxis dataKey="time" />
-                            <YAxis dataKey="counts" />
-                            {/* <Tooltip /> */}
-                            <Legend />
-                            {/* <Area type="monotone" dataKey="amt" fill="#8884d8" stroke="#8884d8" /> */}
-                            <Line type="monotone" dataKey="counts" stroke="#f33968"  strokeWidth={2} />
-                        </LineChart>
-                    </ResponsiveContainer>
-                </div>
+                <CountChart typeName="v1_canister_event_count" title="Events" color="#82ca9d" where={chartsWhere} />
+                <CountChart typeName="v1_canister_caller_count" title="Caller" color="#f33968" where={chartsWhere} />
             </div>}
 
         </>

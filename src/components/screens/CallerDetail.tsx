@@ -1,4 +1,4 @@
-import { useEffect, useState, FC, SyntheticEvent } from 'react'
+import { useEffect, useState, FC, SyntheticEvent, ChangeEvent } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { gql } from 'graphql-request'
 import {
@@ -8,7 +8,7 @@ import {
     Line
 } from 'recharts'
 import moment from 'moment'
-import { Table, Select, Form, DatePicker, Space, Row, Col, Button, Tag, Tooltip } from 'antd'
+import { Table, Select, Form, DatePicker, Space, Row, Col, Button, Tag, Tooltip, Input } from 'antd'
 import { graphQLClient } from '~/config'
 import { Head } from '~/components/shared/Head'
 import icrock from '~/assets/images/ic-rocks.png'
@@ -19,6 +19,7 @@ import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
+import CountChart from '~/components/charts/CountChart'
 dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(relativeTime)
@@ -96,7 +97,7 @@ const CanisterDetail: FC = () => {
     const [eventKeyPage, setEventKeyPage] = useState < number > (1)
     const [queryEventKeys, setQueryEventKeys] = useState < string[] > ([])
     const [tabIndex, setTabIndex] = useState(0)
-    // const [callerInput, setCallerInput] = useState('')
+    const [canisterInput, setCallerInput] = useState('')
     function changeSize(current: number, size: number) {
         setOffset(size)
     }
@@ -133,13 +134,13 @@ const CanisterDetail: FC = () => {
                 }
             })
         }
-        // if (callerInput !== '') {
-        //     where._and = {
-        //         caller: {
-        //             _eq: callerInput
-        //         }
-        //     }
-        // }
+        if (canisterInput !== '') {
+            where._and = {
+                canisterId: {
+                    _eq: canisterInput
+                }
+            }
+        }
         const variables = {
             limit: 15,
             offset: (currentPage - 1) * 15,
@@ -258,9 +259,9 @@ const CanisterDetail: FC = () => {
         }
 
     }
-    // function inputChange(e: ChangeEvent<HTMLInputElement>) {
-    //     setCallerInput(e.currentTarget.value)
-    // }
+    function inputChange(e: ChangeEvent<HTMLInputElement>) {
+        setCallerInput(e.currentTarget.value)
+    }
     function handleChange(arr: string[]) {
         setQueryEventKeys(arr)
     }
@@ -290,7 +291,11 @@ const CanisterDetail: FC = () => {
     //     }
     //     setPage(1)
     // }
-
+    const chartsWhere: WhereType = {
+        caller: {
+            _eq: callerId
+        }
+    } 
     useEffect(() => {
         getEventCount24H()
         getEventCounts7d()
@@ -395,19 +400,20 @@ const CanisterDetail: FC = () => {
                                     })}
                                 </Select>
                             </Form.Item>
-                            <Form.Item label="Time">
+                            <Form.Item label="canisterId">
                                 <Row>
-                                    {/* <Col span={12}>
+                                    <Col span={12}>
                                         <Form.Item
 
-                                            name="caller"
+                                            name="canister"
                                         >
                                             <Input onChange={inputChange} />
                                         </Form.Item>
-                                    </Col> */}
-                                    <Col span={12}>
+                                    </Col>
+                                    <Col span={12} className="pl-5">
                                         <Form.Item
                                             name="time"
+                                            label="time"
                                         >
                                             <Space direction="vertical" size={14}>
                                                 <RangePicker disabledDate={disabledDate} />
@@ -448,38 +454,7 @@ const CanisterDetail: FC = () => {
                     </div>
                 </div>
             ) : <div className="h-full">
-                <div className="card w-full bg-base-100 pt-10 glass">
-                    <div className="flex justify-between">
-                        <h2 className="card-title mb-0 text-gray-600 pl-10 text-xl">Events</h2>
-                        <div className="pr-12 space-x-2">
-                            <button className="btn btn-sm btn-outline base-200">24H</button>
-                            <button className="btn btn-sm base-100">7D</button>
-                            <button className="btn btn-sm btn-outline">30D</button>
-                            <button className="btn btn-sm btn-outline">All</button>
-                        </div>
-                    </div>
-                    <ResponsiveContainer width="100%" height={450}>
-                        <LineChart
-                            width={500}
-                            height={400}
-                            data={eventCount7d}
-                            margin={{
-                                top: 20,
-                                right: 50,
-                                bottom: 20,
-                                left: 5,
-                            }}
-                        >
-                            <CartesianGrid stroke="#ccc" strokeDasharray="3 3" />
-                            <XAxis dataKey="time" />
-                            <YAxis dataKey="counts" />
-                            {/* <Tooltip /> */}
-                            <Legend />
-                            {/* <Area type="monotone" dataKey="amt" fill="#8884d8" stroke="#8884d8" /> */}
-                            <Line type="monotone" dataKey="counts" stroke="#82ca9d" strokeWidth={2} />
-                        </LineChart>
-                    </ResponsiveContainer>
-                </div>
+                <CountChart typeName="v1_caller_event_count" title="Events" color="#82ca9d" where={chartsWhere} />
             </div>}
         </>
     )

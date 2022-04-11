@@ -3,6 +3,7 @@ import { FC, lazy, Suspense, useRef } from 'react'
 import { Outlet, RouteObject, useRoutes, BrowserRouter, Link, useLocation, useNavigate } from 'react-router-dom'
 import logo from '../../logo_title.png'
 import iclogo from '~/assets/images/dfinity.svg'
+import { message } from 'antd'
 const Loading = () => <p className="p-4 w-full h-full text-center"><button className="btn loading">loading</button></p>
 
 const IndexScreen = lazy(() => import('~/components/screens/Index'))
@@ -13,9 +14,13 @@ const CallerDetailScreen = lazy(() => import('~/components/screens/CallerDetail'
 const AnalyticsScreen = lazy(() => import('~/components/screens/Analytics'))
 const SearchScreen = lazy(() => import('~/components/screens/Search'))
 
+const connectInfo = () => {
+    message.info('comming soon!')
+}
+
 const Layout: FC = () => {
     const { pathname } = useLocation()
-    const search = useRef<HTMLInputElement | null>(null)
+    const search = useRef < HTMLInputElement | null > (null)
     const navigate = useNavigate()
     function handleSearch() {
         if (search.current) {
@@ -57,7 +62,7 @@ const Layout: FC = () => {
                                 </button>
                             </div>
                         </div>}
-                        <button className="btn gap-2">
+                        <button className="btn gap-2" onClick={connectInfo}>
                             <img src={iclogo} className="w-10 h-10" />
                             CONNECT
                         </button>
